@@ -1,5 +1,7 @@
 import { createClient } from '../../../../utils/supabase/server';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface MentorResult {
   id: string;
@@ -75,7 +77,7 @@ export default async function MentorResultsPage({
   }
 
   // Build the query with filters
-  let query = supabase
+  const query = supabase
     .from('mentors')
     .select(`
       id,
@@ -213,12 +215,12 @@ export default async function MentorResultsPage({
       <div className="border-b border-gray-800">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
-            <a href="/mentors" className="text-green-500 hover:text-green-400 transition-colors">
+            <Link href="/mentors" className="text-green-500 hover:text-green-400 transition-colors">
               ← Back to Questionnaire
-            </a>
-            <a href="/" className="text-gray-400 hover:text-white transition-colors">
+            </Link>
+            <Link href="/" className="text-gray-400 hover:text-white transition-colors">
               Home
-            </a>
+            </Link>
           </div>
           <h1 className="text-3xl font-bold mb-2">Mentor Search Results</h1>
           <p className="text-gray-400">
@@ -260,9 +262,9 @@ export default async function MentorResultsPage({
             <p className="text-gray-400 mb-6">
               Try adjusting your search criteria to find more mentors.
             </p>
-            <a href="/mentors" className="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+            <Link href="/mentors" className="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
               Modify Search
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -273,10 +275,12 @@ export default async function MentorResultsPage({
               >
                 {/* Profile Header */}
                 <div className="flex items-start space-x-4 mb-4">
-                  <img
-                    src={mentor.photo_url || '/placeholder-avatar.jpg'}
-                    alt={mentor.name}
-                    className="w-16 h-16 rounded-full object-cover"
+                  <Image
+                    src={mentor.photo_url || '/logo.svg'}
+                    alt={`Photo of ${mentor.name}`}
+                    width={96}
+                    height={96}
+                    className="w-24 h-24 rounded-full object-cover"
                   />
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-1">

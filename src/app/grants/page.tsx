@@ -47,7 +47,7 @@ export default function GrantsLandingPage() {
           Choose Your Path to Growth
         </p>
         <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-16">
-          Whether you're looking for grants and funding opportunities or seeking incubation support, we've got you covered.
+          Whether you&apos;re looking for grants and funding opportunities or seeking incubation support, we&apos;ve got you covered.
         </p>
 
         {/* The Card Section */}

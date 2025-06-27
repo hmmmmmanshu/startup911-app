@@ -38,7 +38,7 @@ export default async function KnowledgeBasePage() {
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Founder's Knowledge Base
+            Founder&apos;s Knowledge Base
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             A curated collection of essential resources, guides, and insights to help founders navigate their startup journey successfully.

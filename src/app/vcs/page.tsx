@@ -1,5 +1,6 @@
 import { createClient } from '../../../utils/supabase/server';
 import VCQuestionnaire from '../../../components/feature/VCQuestionnaire';
+import Link from 'next/link';
 
 // Helper function to categorize VC tags based on tag names
 const categorizeVCTags = (tags: any[]) => {
@@ -66,9 +67,9 @@ export default async function VCsPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Error Loading Questionnaire</h1>
           <p className="text-gray-400">Please try again later.</p>
-          <a href="/" className="inline-block mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+          <Link href="/" className="inline-block mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
             ← Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     );

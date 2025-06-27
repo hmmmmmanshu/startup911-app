@@ -3,14 +3,6 @@ import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 
-// Define the interface for blog post data
-interface BlogPost {
-  title: string;
-  slug: string;
-  content: string;
-  published_at: string;
-}
-
 // Define the params interface for the dynamic route
 interface PostPageProps {
   params: {

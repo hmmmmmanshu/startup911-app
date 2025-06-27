@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-import { ArrowDown, Chrome, Clock, Target, TrendingDown, DollarSign, Bot, Zap, CheckCircle, MousePointer, Play, Check, Star, Gift, Crown, Menu, X, Twitter, Linkedin, Mail } from 'lucide-react';
+import { ArrowDown, Chrome, Clock, Target, TrendingDown, DollarSign, Bot, Zap, CheckCircle, MousePointer, Play, Check, Gift, Crown, Menu, X, Twitter, Linkedin, Mail } from 'lucide-react';
 
 // TypewriterEffect component (migrated inline)
 interface TypewriterEffectProps {
@@ -61,7 +61,7 @@ const Button = ({
   className?: string;
   size?: "default" | "lg";
   variant?: "default" | "outline";
-  [key: string]: any;
+  onClick?: () => void;
 }) => {
   const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background";
   const sizeClasses = size === "lg" ? "h-11 px-8" : "h-10 px-4 py-2";
@@ -77,11 +77,11 @@ const Button = ({
 
 
 // Accordion components (simplified)
-const Accordion = ({ children, className = "", ...props }: { children: React.ReactNode; className?: string; [key: string]: any }) => {
+const Accordion = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   return <div className={className}>{children}</div>;
 };
 
-const AccordionItem = ({ children, className = "", ...domProps }: { children: React.ReactNode; className?: string; [key: string]: any }) => {
+const AccordionItem = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className={className}>
@@ -92,11 +92,11 @@ const AccordionItem = ({ children, className = "", ...domProps }: { children: Re
   );
 };
 
-const AccordionTrigger = ({ children, className = "", isOpen, setIsOpen, ...props }: any) => {
+const AccordionTrigger = ({ children, className = "", isOpen, setIsOpen }: { children: React.ReactNode; className?: string; isOpen?: boolean; setIsOpen?: (open: boolean) => void }) => {
   return (
     <button 
       className={`flex flex-1 items-center justify-between text-left font-medium transition-all hover:underline ${className}`}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={() => setIsOpen?.(!isOpen)}
     >
       {children}
       <span className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
@@ -104,7 +104,7 @@ const AccordionTrigger = ({ children, className = "", isOpen, setIsOpen, ...prop
   );
 };
 
-const AccordionContent = ({ children, className = "", isOpen, ...props }: any) => {
+const AccordionContent = ({ children, className = "", isOpen }: { children: React.ReactNode; className?: string; isOpen?: boolean }) => {
   return (
     <div className={`overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
       <div className={className}>{children}</div>
@@ -459,7 +459,7 @@ export default function ExtensionPage() {
                     Ready to Fire Your Expensive Team?
                   </h3>
                   <p className="text-gray-600 mb-6 text-base sm:text-lg">
-                    Join thousands of entrepreneurs who've already saved hundreds of thousands with Grants Snap.
+                    Join thousands of entrepreneurs who&apos;ve already saved hundreds of thousands with Grants Snap.
                   </p>
                   <Button 
                     size="lg" 

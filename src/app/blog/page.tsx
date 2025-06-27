@@ -88,7 +88,7 @@ export default async function BlogPage() {
         ) : (
           // Enhanced Posts List
           <div className="space-y-0">
-            {posts.map((post: BlogPost, index: number) => (
+            {posts.map((post: BlogPost) => (
               <article key={post.slug} className="group">
                 <Link
                   href={`/blog/${post.slug}`}

@@ -2,8 +2,8 @@ import { createClient } from '../../../../utils/supabase/server';
 import GrantQuestionnaire from '../../../../components/feature/GrantQuestionnaire';
 
 // This is a helper function to group our tags
-const groupTagsByType = (tags: any[]) => {
-  return tags.reduce((acc, tag) => {
+const groupTagsByType = (tags: { id: number; name: string; type: string }[]) => {
+  return tags.reduce((acc: Record<string, typeof tags>, tag) => {
     const type = tag.type || 'UNCATEGORIZED';
     if (!acc[type]) {
       acc[type] = [];

@@ -145,8 +145,6 @@ export default async function GrantsResultsPage({ searchParams }: GrantsResultsP
       // Track which categories have been matched (V2: Cap scoring per category)
       let matchedStage = false
       let matchedIndustry = false
-      let matchedLocation = false
-      let matchedSocialImpact = false
 
       // Check for stage matches
       const userStageIds = userSelections.stage as number[] || []
@@ -183,7 +181,6 @@ export default async function GrantsResultsPage({ searchParams }: GrantsResultsP
           tag.type === 'LOCATION' && userLocationIds.includes(tag.id)
         )
         if (locationMatches.length > 0) {
-          matchedLocation = true
           matchScore += 15
           matchingTags.push(...locationMatches)
           matchReasons.push(`Available in ${locationMatches.map(t => t.name).join(', ')}`)
@@ -197,7 +194,6 @@ export default async function GrantsResultsPage({ searchParams }: GrantsResultsP
           tag.type === 'SOCIAL_IMPACT' && userSocialImpactIds.includes(tag.id)
         )
         if (socialImpactMatches.length > 0) {
-          matchedSocialImpact = true
           matchScore += 15
           matchingTags.push(...socialImpactMatches)
           matchReasons.push(`Supports ${socialImpactMatches.map(t => t.name).join(', ')}`)
