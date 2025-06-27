@@ -82,7 +82,7 @@ export default async function BlogPage() {
             </div>
             <h2 className="text-2xl font-semibold mb-4 text-gray-300">No articles yet</h2>
             <p className="text-gray-500 max-w-md mx-auto">
-              We're working on some amazing content. Check back soon for our latest insights and stories.
+              We&apos;re working on some amazing content. Check back soon for our latest insights and stories.
             </p>
           </div>
         ) : (

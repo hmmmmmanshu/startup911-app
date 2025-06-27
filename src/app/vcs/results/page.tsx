@@ -1,30 +1,5 @@
 import { createClient } from '../../../../utils/supabase/server';
-
-// Define types for our data structures
-interface VC {
-  id: number
-  name: string
-  website: string | null
-  linkedin: string | null
-  country_based_of: string | null
-  about: string | null
-  key_person: string | null
-  created_at: string
-}
-
-interface Tag {
-  id: number
-  name: string
-  type: string | null
-}
-
-interface VCWithScore extends VC {
-  matchScore: number
-  matchingTags: Tag[]
-  tier: number
-  tierLabel: string
-  matchReasons: string[]
-}
+import type { VC, VCWithScore, Tag } from '../../../../lib/types';
 
 interface VCsResultsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -133,7 +108,7 @@ function getRegionNameById(regionId: string): string {
 }
 
 // Helper function to get VC tags from junction table
-async function getVCTags(supabase: any, vcId: number): Promise<Tag[]> {
+async function getVCTags(supabase: Awaited<ReturnType<typeof createClient>>, vcId: number): Promise<Tag[]> {
   const { data, error } = await supabase
     .from('vc_tags')
     .select(`
@@ -149,7 +124,7 @@ async function getVCTags(supabase: any, vcId: number): Promise<Tag[]> {
     return []
   }
 
-  return data.map((item: any) => item.tags).filter(Boolean)
+  return data.map((item) => item.tags).filter(Boolean) as Tag[]
 }
 
 export default async function VCsResultsPage({ searchParams }: VCsResultsPageProps) {
@@ -208,7 +183,6 @@ export default async function VCsResultsPage({ searchParams }: VCsResultsPagePro
       // Track which categories have been matched (V2: Cap scoring per category)
       let matchedStage = false
       let matchedIndustry = false
-      let matchedInvestmentType = false
 
       // Check for stage matches
       const userStageIds = userSelections.stage as number[] || []
@@ -253,7 +227,6 @@ export default async function VCsResultsPage({ searchParams }: VCsResultsPagePro
       if (userInvestmentTypeIds.length > 0) {
         const investmentTypeMatches = vcTags.filter(tag => userInvestmentTypeIds.includes(tag.id))
         if (investmentTypeMatches.length > 0) {
-          matchedInvestmentType = true
           matchScore += 25
           matchingTags.push(...investmentTypeMatches)
           matchReasons.push(`Focus: ${investmentTypeMatches.map(t => t.name).join(', ')}`)

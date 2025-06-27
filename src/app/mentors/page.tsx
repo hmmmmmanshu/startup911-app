@@ -1,9 +1,10 @@
 import { createClient } from '../../../utils/supabase/server';
 import MentorQuestionnaire from '../../../components/feature/MentorQuestionnaire';
 import Link from 'next/link';
+import type { Tag } from '../../../lib/types';
 
 // Helper function to filter industry tags for mentors
-const getIndustryTags = (tags: any[]) => {
+const getIndustryTags = (tags: Tag[]) => {
   // Define common industries that mentors typically specialize in
   const mentorIndustries = [
     'Finance', 'Health Care', 'Consumer', 'Enterprise', 'Bio Tech', 'Web3', 

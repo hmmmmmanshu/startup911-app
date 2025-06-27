@@ -1,9 +1,10 @@
 import { createClient } from '../../../utils/supabase/server';
 import VCQuestionnaire from '../../../components/feature/VCQuestionnaire';
 import Link from 'next/link';
+import type { Tag } from '../../../lib/types';
 
 // Helper function to categorize VC tags based on tag names
-const categorizeVCTags = (tags: any[]) => {
+const categorizeVCTags = (tags: Tag[]) => {
   const fundingStages = [
     'Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Series C+', 
     'Pre-Series A', 'Angel', 'Debt Financing', 'Post-IPO Debt', 'Post-IPO Equity', 'Grant'
@@ -19,7 +20,9 @@ const categorizeVCTags = (tags: any[]) => {
     'Deep tech', 'Medical', 'Medical Device', 'Renewable Energy'
   ];
 
-  const categories: { [key: string]: any[] } = {
+  const categories: { 
+    [key: string]: (Tag | { id: string; name: string; type: string; countries?: string[] })[] 
+  } = {
     STAGE: [],
     INDUSTRY: [],
     INVESTMENT_TYPE: []
@@ -53,7 +56,7 @@ export default async function VCsPage() {
   const [tagsResult, countriesResult] = await Promise.all([
     supabase
       .from('tags')
-      .select('id, name')
+      .select('id, name, type')
       .in('id', tagIds),
     supabase
       .from('vcs')

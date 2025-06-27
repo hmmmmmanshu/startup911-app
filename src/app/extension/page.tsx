@@ -86,7 +86,7 @@ const AccordionItem = ({ children, className = "" }: { children: React.ReactNode
   return (
     <div className={className}>
       {React.Children.map(children, child => 
-        React.isValidElement(child) ? React.cloneElement(child, { isOpen, setIsOpen } as any) : child
+        React.isValidElement(child) ? React.cloneElement(child, { isOpen, setIsOpen } as React.Attributes) : child
       )}
     </div>
   );

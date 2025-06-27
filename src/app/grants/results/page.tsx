@@ -1,45 +1,8 @@
 import { createClient } from '../../../../utils/supabase/server'
+import type { Grant, Tag, GrantWithScore } from '../../../../lib/types'
 
 interface GrantsResultsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}
-
-// Define types for our data structures
-interface Tag {
-  id: number
-  name: string
-  type: string
-}
-
-interface Grant {
-  id: number
-  name: string
-  organization: string | null
-  details: string | null
-  status: string | null
-  amount_max: string | null
-  dpiit_required: boolean | null
-  tech_focus_required: boolean | null
-  patent_required: boolean | null
-  prototype_required: boolean | null
-  technical_cofounder_required: boolean | null
-  full_time_commitment: boolean | null
-  women_led_focus: boolean | null
-  student_focus: boolean | null
-  application_deadline: string | null
-  application_link: string | null
-  mentorship_included: boolean | null
-  workspace_provided: boolean | null
-  network_access: boolean | null
-  created_at: string
-}
-
-interface GrantWithScore extends Grant {
-  matchScore: number
-  matchingTags: Tag[]
-  tier: number
-  tierLabel: string
-  matchReasons: string[]
 }
 
 // Helper function to parse URL parameters into arrays of numbers
@@ -57,7 +20,7 @@ function parseSearchParams(params: { [key: string]: string | string[] | undefine
 }
 
 // Helper function to get grant tags from junction table
-async function getGrantTags(supabase: any, grantId: number): Promise<Tag[]> {
+async function getGrantTags(supabase: Awaited<ReturnType<typeof createClient>>, grantId: number): Promise<Tag[]> {
   const { data, error } = await supabase
     .from('grant_tags')
     .select(`
@@ -73,7 +36,7 @@ async function getGrantTags(supabase: any, grantId: number): Promise<Tag[]> {
     return []
   }
 
-  return data.map((item: any) => item.tags).filter(Boolean)
+  return data.map((item) => item.tags).filter(Boolean) as Tag[]
 }
 
 export default async function GrantsResultsPage({ searchParams }: GrantsResultsPageProps) {
