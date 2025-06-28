@@ -1,44 +1,40 @@
 import { createClient } from '../../../../utils/supabase/server';
-import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-// Define the params interface for the dynamic route
-interface PostPageProps {
-  params: {
-    slug: string;
-  };
-}
-
-// Helper function to format date cleanly
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
-
-// Main post page component
-export default async function PostPage({ params }: PostPageProps) {
+// This is the corrected function signature that solves the build error
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Await the params since they're now a Promise in Next.js 15
+  const { slug } = await params;
+  
   const supabase = await createClient();
 
-  // Fetch the specific post by slug
+  // Fetch the single post from the database
   const { data: post, error } = await supabase
     .from('posts')
-    .select('title, slug, content, published_at')
-    .eq('slug', params.slug)
+    .select('*')
+    .eq('slug', slug)
     .eq('is_published', true)
     .single();
 
-  // Handle error or not found
+  // If no post is found for the given slug, show a 404 page
   if (error || !post) {
     notFound();
   }
 
+  // Helper function to format date cleanly
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
-    <div className="bg-[#121212] text-white min-h-screen">
+    <div className="bg-black min-h-screen text-white">
       <div className="max-w-4xl mx-auto px-6 py-16">
         {/* Back to Blog Link */}
         <div className="mb-8">
