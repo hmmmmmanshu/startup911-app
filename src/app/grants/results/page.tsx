@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { createClient } from '../../../../utils/supabase/server';
-import type { Grant, Tag, ScoredGrant } from '../../../../lib/types';
+import type { Grant, ScoredGrant } from '../../../../lib/types';
 
 // Helper to safely parse numbers from the URL
 const parseIds = (param: string | undefined) => param?.split(',').map(Number).filter(Boolean) || [];
@@ -109,7 +109,7 @@ export default async function GrantsResultsPage({
               Try adjusting your selections for a broader search.
             </p>
             <Link
-              href="/grants"
+              href="/grants" 
               className="inline-block px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
             >
               Modify Search
@@ -130,7 +130,7 @@ export default async function GrantsResultsPage({
                     </div>
                     <div className="text-right ml-4">
                       <div className="bg-green-600 text-black px-3 py-1 rounded-full text-sm font-bold">
-                        {grant.matchScore}% Match
+                      {grant.matchScore}% Match
                       </div>
                     </div>
                   </div>
@@ -164,21 +164,21 @@ export default async function GrantsResultsPage({
 
                   {/* Action Button */}
                   <div className="text-right">
-                    {grant.application_link ? (
-                      <a
-                        href={grant.application_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                  {grant.application_link ? (
+                    <a
+                      href={grant.application_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
                         className="inline-block px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
-                      >
+                    >
                         Apply Now
-                      </a>
-                    ) : (
+                    </a>
+                  ) : (
                       <span className="inline-block px-6 py-2 bg-gray-600 text-gray-300 font-semibold rounded-lg cursor-not-allowed">
                         Details Pending
                       </span>
                     )}
-                  </div>
+                    </div>
                 </div>
               ))}
             </div>
