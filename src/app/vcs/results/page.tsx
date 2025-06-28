@@ -4,19 +4,20 @@ import Link from 'next/link';
 import { createClient } from '../../../../utils/supabase/server';
 import type { VC } from '../../../../lib/types'; // Import our defined VC type
 
-type PageProps = { searchParams: { [key: string]: string | undefined } };
+type PageProps = { searchParams: Promise<{ [key: string]: string | undefined }> };
 
 // Helper to safely parse numbers from the URL
 const parseIds = (param: string | undefined) => param?.split(',').map(Number).filter(Boolean) || [];
 
 // Main Page Component - Rewritten for type safety
 export default async function VCsResultsPage({ searchParams }: PageProps) {
-  const supabase = await createClient();
+    const params = await searchParams;
+    const supabase = await createClient();
 
   // --- 1. PARSE USER INPUT ---
-  const selectedIndustryIds = parseIds(searchParams.INDUSTRY);
-  const selectedStageIds = parseIds(searchParams.STAGE);
-  const selectedLocationIds = parseIds(searchParams.LOCATION);
+      const selectedIndustryIds = parseIds(params.INDUSTRY);
+    const selectedStageIds = parseIds(params.STAGE);
+    const selectedLocationIds = parseIds(params.LOCATION);
   const allSelectedIds = [...selectedIndustryIds, ...selectedStageIds, ...selectedLocationIds];
 
   // --- 2. FETCH DATA ---
@@ -80,11 +81,11 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
                 <div className="mt-6 text-right">
                   <a 
                     href={vc.website || '#'} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     className="inline-block px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
-                  >
-                    Visit Website
+                    >
+                      Visit Website
                   </a>
                 </div>
               </div>

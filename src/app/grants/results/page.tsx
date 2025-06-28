@@ -2,18 +2,19 @@ import Link from 'next/link';
 import { createClient } from '../../../../utils/supabase/server';
 import type { Grant } from '../../../../lib/types';
 
-type PageProps = { searchParams: { [key: string]: string | undefined } };
+type PageProps = { searchParams: Promise<{ [key: string]: string | undefined }> };
 
 const parseIds = (param: string | undefined) => param?.split(',').map(Number).filter(Boolean) || [];
 
 export default async function GrantsResultsPage({ searchParams }: PageProps) {
+    const params = await searchParams;
     const supabase = await createClient();
-    const selectedStageIds = parseIds(searchParams.STAGE);
-    const selectedIndustryIds = parseIds(searchParams.INDUSTRY);
-    const selectedRequirementIds = parseIds(searchParams.REQUIREMENT);
-    const selectedLocationIds = parseIds(searchParams.LOCATION);
-    const selectedSocialImpactIds = parseIds(searchParams.SOCIAL_IMPACT);
-    const selectedSpecialCategoryIds = parseIds(searchParams.SPECIAL_CATEGORY);
+    const selectedStageIds = parseIds(params.STAGE);
+    const selectedIndustryIds = parseIds(params.INDUSTRY);
+    const selectedRequirementIds = parseIds(params.REQUIREMENT);
+    const selectedLocationIds = parseIds(params.LOCATION);
+    const selectedSocialImpactIds = parseIds(params.SOCIAL_IMPACT);
+    const selectedSpecialCategoryIds = parseIds(params.SPECIAL_CATEGORY);
 
     const { data: grantsData, error: grantsError } = await supabase.from('grants').select('*, grant_tags(tags(id, name, type))');
     const { data: allTagsData, error: tagsError } = await supabase.from('tags').select('id, name');
@@ -55,7 +56,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
             <div className="container mx-auto max-w-4xl">
                 <h1 className="text-4xl font-bold text-center mb-4">Your Recommended Grants</h1>
                 <p className="text-center text-gray-400 mb-12">Based on your selections, here are the best matches for you.</p>
-                {sortedGrants.length === 0 ? (
+        {sortedGrants.length === 0 ? (
                     <div className="text-center bg-gray-900 p-8 rounded-lg">
                         <h2 className="text-2xl font-bold">No grants found.</h2>
                         <p className="text-gray-400 mt-2">Try adjusting your selections for a broader search.</p>
@@ -69,18 +70,18 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                     <div>
                                         <h2 className="text-2xl font-bold text-purple-400">{grant.name}</h2>
                                         <p className="text-gray-400 mt-1">{grant.organization}</p>
-                                    </div>
+                      </div>
                                     <div className="bg-green-500/10 text-green-300 font-bold px-3 py-1 rounded-full text-sm">Score: {grant.matchScore}</div>
-                                </div>
+                      </div>
                                 <p className="mt-4 text-gray-300">{grant.details}</p>
                                 <div className="mt-6 text-right">
                                     <a href={grant.application_link || '#'} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">Apply Now</a>
-                                </div>
-                            </div>
+                      </div>
+                    </div>
                         ))}
                     </div>
-                )}
+                  )}
             </div>
-        </div>
+          </div>
     );
 } 
