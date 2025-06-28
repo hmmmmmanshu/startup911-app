@@ -4,15 +4,13 @@ import Link from 'next/link';
 import { createClient } from '../../../../utils/supabase/server';
 import type { VC } from '../../../../lib/types'; // Import our defined VC type
 
+type PageProps = { searchParams: { [key: string]: string | undefined } };
+
 // Helper to safely parse numbers from the URL
 const parseIds = (param: string | undefined) => param?.split(',').map(Number).filter(Boolean) || [];
 
 // Main Page Component - Rewritten for type safety
-export default async function VCsResultsPage({
-  searchParams,
-}: {
-  searchParams: { [key:string]: string | undefined };
-}) {
+export default async function VCsResultsPage({ searchParams }: PageProps) {
   const supabase = await createClient();
 
   // --- 1. PARSE USER INPUT ---
@@ -30,14 +28,13 @@ export default async function VCsResultsPage({
   const vcs: VC[] = vcsData || [];
 
   if (error) {
-    return <p className="text-white text-center p-8">Could not load VCs. Please try again.</p>;
+    return <p className="text-white text-center p-8">Could not load VC data. Please try again.</p>;
   }
 
   // --- 3. ALGORITHM: SCORING & SORTING ---
   const scoredVCs = vcs.map(vc => {
     let matchScore = 0;
-    // This correctly extracts all tag IDs associated with a VC
-    // @ts-expect-error - Vercel build requires this instead of ts-ignore
+    // @ts-expect-error - Safely handling complex Supabase join types
     const vcTagIds = vc.vc_tags.map(vt => vt.tags.id);
     
     // Increment score for each match
