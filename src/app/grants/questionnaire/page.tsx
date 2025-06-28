@@ -1,5 +1,6 @@
 import { createClient } from '../../../../utils/supabase/server';
 import GrantQuestionnaire from '../../../../components/feature/GrantQuestionnaire';
+import Link from 'next/link';
 
 // This is a helper function to group our tags
 const groupTagsByType = (tags: { id: number; name: string; type: string }[]) => {
@@ -28,9 +29,9 @@ export default async function GrantsQuestionnairePage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Error Loading Questionnaire</h1>
           <p className="text-gray-400">Please try again later.</p>
-          <a href="/grants" className="inline-block mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+          <Link href="/grants" className="inline-block mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
             ← Back to Grants
-          </a>
+          </Link>
         </div>
       </div>
     );

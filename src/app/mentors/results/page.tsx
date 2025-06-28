@@ -58,7 +58,6 @@ export default async function MentorsResultsPage({
   const { data: mentors, error } = await query;
 
   if (error) {
-    console.error('Error fetching mentors:', error);
     return (
       <div className="bg-black min-h-screen text-white flex items-center justify-center">
         <div className="text-center">

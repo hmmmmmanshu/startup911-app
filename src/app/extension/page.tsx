@@ -789,7 +789,7 @@ export default function ExtensionPage() {
                   },
                   {
                     question: "What happens after I use up my form fills?",
-                    answer: "For the Proof plan (15 fills), you can upgrade to Growth for unlimited access. Your progress and templates are saved, so you won't lose any work when upgrading."
+                    answer: "For the Proof plan (15 fills), you can upgrade to Growth for unlimited access. Your progress and templates are saved, so you won&apos;t lose any work when upgrading."
                   },
                   {
                     question: "How do I install the extension?",
