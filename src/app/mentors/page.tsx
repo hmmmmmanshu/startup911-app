@@ -2,17 +2,7 @@ import { createClient } from '../../../utils/supabase/server';
 import MentorQuestionnaire from '../../../components/feature/MentorQuestionnaire';
 import type { Tag } from '../../../lib/types';
 
-// This is a helper function to group our tags
-const groupTagsByType = (tags: Tag[]) => {
-  return tags.reduce((acc: { [key: string]: Tag[] }, tag) => {
-    const type = tag.type || 'UNCATEGORIZED';
-    if (!acc[type]) {
-      acc[type] = [];
-    }
-    acc[type].push(tag);
-    return acc;
-  }, {});
-};
+
 
 // This is the Mentors Page, now fully type-safe
 export default async function MentorsPage() {
