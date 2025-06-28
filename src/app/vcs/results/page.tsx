@@ -37,7 +37,7 @@ export default async function VCsResultsPage({
   const scoredVCs = vcs.map(vc => {
     let matchScore = 0;
     // This correctly extracts all tag IDs associated with a VC
-    // @ts-ignore - Handling complex join types from Supabase safely
+    // @ts-expect-error - Vercel build requires this instead of ts-ignore
     const vcTagIds = vc.vc_tags.map(vt => vt.tags.id);
     
     // Increment score for each match
