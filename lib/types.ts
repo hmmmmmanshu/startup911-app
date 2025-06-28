@@ -29,16 +29,29 @@ export type Grant = {
   workspace_provided: boolean | null;
   network_access: boolean | null;
   created_at: string;
+  // Optional property for when we join with grant_tags
+  grant_tags?: Array<{
+    tags: {
+      id: number;
+      name: string;
+      type: string;
+    };
+  }>;
 };
 
 // Extended Grant type with scoring information
 export interface GrantWithScore extends Grant {
   matchScore: number;
-  matchingTags: Tag[];
-  tier: number;
-  tierLabel: string;
-  matchReasons: string[];
+  matchingTags?: Tag[];
+  tier?: number;
+  tierLabel?: string;
+  matchReasons?: string[];
 }
+
+// Simple scored grant type for results page
+export type ScoredGrant = Grant & {
+  matchScore: number;
+};
 
 // Defines the shape of a VC, including its associated tags
 export type VC = {
