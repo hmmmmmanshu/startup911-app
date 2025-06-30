@@ -19,13 +19,13 @@ const LANGUAGE_OPTIONS = [
   'English', 'Hindi', 'Bengali', 'Marathi', 'Telugu', 'Tamil', 'Gujarati', 'Urdu'
 ];
 
-// Hard-coded budget options
+// Hard-coded budget options (matching database rate_tier values)
 const BUDGET_OPTIONS = [
   'Free',
-  'Less than ₹1,000 per hour',
-  '₹1,000 - ₹3,000 per hour',
-  '₹3,000 - ₹5,000 per hour',
-  '₹5,000+ per hour'
+  '<₹1K',
+  '₹1K-3K',
+  '₹3K-5K',
+  '₹5K+'
 ];
 
 interface MentorQuestionnaireProps {

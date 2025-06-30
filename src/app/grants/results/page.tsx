@@ -9,12 +9,12 @@ const parseIds = (param: string | undefined) => param?.split(',').map(Number).fi
 export default async function GrantsResultsPage({ searchParams }: PageProps) {
     const params = await searchParams;
     const supabase = await createClient();
-    const selectedStageIds = parseIds(params.STAGE);
-    const selectedIndustryIds = parseIds(params.INDUSTRY);
-    const selectedRequirementIds = parseIds(params.REQUIREMENT);
-    const selectedLocationIds = parseIds(params.LOCATION);
-    const selectedSocialImpactIds = parseIds(params.SOCIAL_IMPACT);
-    const selectedSpecialCategoryIds = parseIds(params.SPECIAL_CATEGORY);
+    const selectedStageIds = parseIds(params.stage);
+    const selectedIndustryIds = parseIds(params.industry);
+    const selectedRequirementIds = parseIds(params.requirement);
+    const selectedLocationIds = parseIds(params.location);
+    const selectedSocialImpactIds = parseIds(params.social_impact);
+    const selectedSpecialCategoryIds = parseIds(params.special_category);
 
     const { data: grantsData, error: grantsError } = await supabase.from('grants').select('*, grant_tags(tags(id, name, type))');
     const { data: allTagsData, error: tagsError } = await supabase.from('tags').select('id, name');

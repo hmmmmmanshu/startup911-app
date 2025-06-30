@@ -8,11 +8,10 @@ type Tag = { id: number; name: string; type: string };
 type GroupedTags = { [key: string]: Tag[] };
 
 // Define the questions and the order they will appear in
-const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'INVESTMENT_TYPE', 'LOCATION'];
+const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'LOCATION'];
 const QUESTION_TITLES: { [key: string]: string } = {
   STAGE: "What's your startup's funding stage?",
   INDUSTRY: "Which industry do you operate in?",
-  INVESTMENT_TYPE: "What type of investment are you looking for?",
   LOCATION: "Which regions are you targeting for VCs?"
 };
 

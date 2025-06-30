@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# MCP Configuration (contains sensitive tokens)
+.cursor/mcp.json

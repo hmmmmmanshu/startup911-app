@@ -15,9 +15,9 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
     const supabase = await createClient();
 
   // --- 1. PARSE USER INPUT ---
-      const selectedIndustryIds = parseIds(params.INDUSTRY);
-    const selectedStageIds = parseIds(params.STAGE);
-    const selectedLocationIds = parseIds(params.LOCATION);
+      const selectedIndustryIds = parseIds(params.industry);
+    const selectedStageIds = parseIds(params.stage);
+    const selectedLocationIds = parseIds(params.location);
   const allSelectedIds = [...selectedIndustryIds, ...selectedStageIds, ...selectedLocationIds];
 
   // --- 2. FETCH DATA ---
