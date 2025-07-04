@@ -53,12 +53,14 @@ export default function HomePage() {
             Stop wasting hours filling out the same information on endless grant forms. Our browser extension automates the tedious work so you can focus on what matters most: building your company.
           </p>
           <div className="mt-8">
-            <Link 
-              href="https.snap-grant-launchpad.lovable.app/" 
+            <a 
+              href="https://snap-grant-launchpad.lovable.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-block px-8 py-4 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-500/40 hover:bg-green-700 hover:scale-105 transform transition-all duration-300"
             >
               Learn More & Get Started
-            </Link>
+            </a>
           </div>
         </div>
       </section>
