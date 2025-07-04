@@ -46,7 +46,7 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
     });
 
     return { ...vc, matchScore };
-  }).filter(vc => vc.matchScore > 0); // Only show VCs with at least one match
+  });
 
   const sortedVCs = scoredVCs.sort((a, b) => b.matchScore - a.matchScore);
 

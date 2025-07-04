@@ -26,28 +26,38 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
     const grants: Grant[] = grantsData || [];
     const requirementMap = new Map((allTagsData || []).map(tag => [tag.id, tag.name]));
 
-    const filteredGrants = grants.filter(grant => {
-        const userHasRequirement = (name: string) => selectedRequirementIds.some(id => requirementMap.get(id) === name);
-        if (grant.dpiit_required && !userHasRequirement('DPIIT Registration')) return false;
-        if (grant.patent_required && !userHasRequirement('Patent/IP')) return false;
-        if (grant.prototype_required && !userHasRequirement('Working Prototype')) return false;
-        if (grant.technical_cofounder_required && !userHasRequirement('Technical Co-founder')) return false;
-        if (grant.full_time_commitment && !userHasRequirement('Full-time Commitment')) return false;
-        if (grant.women_led_focus && !selectedSpecialCategoryIds.some(id => requirementMap.get(id) === 'Women-Led Startup')) return false;
-        if (grant.student_focus && !selectedSpecialCategoryIds.some(id => requirementMap.get(id) === 'Student Startup')) return false;
-        return true;
-    });
-
-    const scoredGrants = filteredGrants.map(grant => {
+    const scoredGrants = grants.map(grant => {
         let matchScore = 0;
+        let isEligible = true;
+        const requirementsMet = new Set<string>();
+
+        // Positive scoring for tag matches
         // @ts-expect-error - Handling complex Supabase join types safely
         const grantTagIds = grant.grant_tags.map(gt => gt.tags.id);
         if (selectedStageIds.some(id => grantTagIds.includes(id))) matchScore += 25;
         if (selectedIndustryIds.some(id => grantTagIds.includes(id))) matchScore += 25;
         if (selectedLocationIds.some(id => grantTagIds.includes(id))) matchScore += 10;
         if (selectedSocialImpactIds.some(id => grantTagIds.includes(id))) matchScore += 10;
-        return { ...grant, matchScore };
-    }).filter(grant => grant.matchScore > 0);
+        
+        // Check for special categories
+        if (grant.women_led_focus && selectedSpecialCategoryIds.some(id => requirementMap.get(id) === 'Women-Led Startup')) matchScore += 15;
+        if (grant.student_focus && selectedSpecialCategoryIds.some(id => requirementMap.get(id) === 'Student Startup')) matchScore += 15;
+
+        // Check hard requirements
+        const userHasRequirement = (name: string) => selectedRequirementIds.some(id => requirementMap.get(id) === name);
+        if (grant.dpiit_required && !userHasRequirement('DPIIT Registration')) isEligible = false;
+        if (grant.patent_required && !userHasRequirement('Patent/IP')) isEligible = false;
+        if (grant.prototype_required && !userHasRequirement('Working Prototype')) isEligible = false;
+        if (grant.technical_cofounder_required && !userHasRequirement('Technical Co-founder')) isEligible = false;
+        if (grant.full_time_commitment && !userHasRequirement('Full-time Commitment')) isEligible = false;
+
+        // If not eligible, apply a heavy penalty to push it down the list
+        if (!isEligible) {
+            matchScore -= 100;
+        }
+
+        return { ...grant, matchScore, isEligible };
+    });
 
     const sortedGrants = scoredGrants.sort((a, b) => b.matchScore - a.matchScore);
 
@@ -65,14 +75,19 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                 ) : (
                     <div className="space-y-6">
                         {sortedGrants.map(grant => (
-                            <div key={grant.id} className="bg-[#1C1C1E] rounded-lg p-6 border border-gray-800">
+                            <div key={grant.id} className={`bg-[#1C1C1E] rounded-lg p-6 border ${grant.isEligible ? 'border-gray-800' : 'border-red-500/50'}`}>
                                 <div className="flex justify-between items-start">
                                     <div>
                                         <h2 className="text-2xl font-bold text-purple-400">{grant.name}</h2>
                                         <p className="text-gray-400 mt-1">{grant.organization}</p>
                       </div>
-                                    <div className="bg-green-500/10 text-green-300 font-bold px-3 py-1 rounded-full text-sm">Score: {grant.matchScore}</div>
+                                    <div className={`font-bold px-3 py-1 rounded-full text-sm ${grant.isEligible ? 'bg-green-500/10 text-green-300' : 'bg-red-500/10 text-red-300'}`}>Score: {grant.matchScore}</div>
                       </div>
+                                {!grant.isEligible && (
+                                    <p className="mt-3 text-sm text-red-400 bg-red-500/10 p-2 rounded-md">
+                                        This grant has specific eligibility requirements you may not meet.
+                                    </p>
+                                )}
                                 <p className="mt-4 text-gray-300">{grant.details}</p>
                                 <div className="mt-6 text-right">
                                     <a href={grant.application_link || '#'} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">Apply Now</a>

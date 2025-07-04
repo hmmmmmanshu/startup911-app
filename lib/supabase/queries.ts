@@ -30,6 +30,14 @@ export interface Grant {
   created_at: string
 }
 
+export interface WaitlistEntry {
+  id: string
+  email: string
+  source: string
+  created_at: string
+  updated_at: string
+}
+
 // Fetch all tags grouped by type
 export async function fetchTagsGroupedByType() {
   const { data: tags, error } = await supabase
@@ -98,4 +106,58 @@ export async function fetchMatchingGrants(selectedTagIds: number[]) {
   }
 
   return grants || []
+}
+
+// Add email to waitlist
+export async function addToWaitlist(email: string, source: string = 'grant_snap_extension') {
+  const { data, error } = await supabase
+    .from('waitlist')
+    .insert([
+      {
+        email: email.toLowerCase().trim(),
+        source: source
+      }
+    ])
+    .select()
+
+  if (error) {
+    // Check if it's a duplicate email error
+    if (error.code === '23505') {
+      throw new Error('This email is already on the waitlist')
+    }
+    console.error('Error adding to waitlist:', error)
+    throw new Error('Failed to add email to waitlist')
+  }
+
+  return data?.[0] || null
+}
+
+// Get waitlist count (for admin purposes)
+export async function getWaitlistCount() {
+  const { count, error } = await supabase
+    .from('waitlist')
+    .select('*', { count: 'exact', head: true })
+
+  if (error) {
+    console.error('Error fetching waitlist count:', error)
+    throw new Error('Failed to fetch waitlist count')
+  }
+
+  return count || 0
+}
+
+// Check if email exists in waitlist
+export async function checkEmailInWaitlist(email: string) {
+  const { data, error } = await supabase
+    .from('waitlist')
+    .select('id')
+    .eq('email', email.toLowerCase().trim())
+    .single()
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error checking email in waitlist:', error)
+    throw new Error('Failed to check email in waitlist')
+  }
+
+  return !!data
 } 

@@ -55,7 +55,8 @@ export default async function MentorsResultsPage({
   }
   
   // Execute the query
-  const { data: mentors, error } = await query;
+  const { data: mentorsData, error } = await query;
+  const mentors: MentorWithTags[] = mentorsData || [];
 
   if (error) {
     return (
@@ -85,13 +86,25 @@ export default async function MentorsResultsPage({
     );
   }
   
-  // --- 3. FILTER BY INDUSTRY TAG ---
-  // Filter mentors based on industry tags if specified
-  const filteredMentors = selectedIndustryIds.length > 0
-    ? (mentors as MentorWithTags[]).filter(mentor => 
-        mentor.mentor_tags?.some(mt => selectedIndustryIds.includes(mt.tags.id))
-      )
-    : mentors as MentorWithTags[];
+  // --- 3. SCORE & SORT MENTORS (No more hard filtering) ---
+  const scoredMentors = mentors.map(mentor => {
+    let matchScore = 0;
+    
+    // Score based on industry match
+    const mentorTagIds = mentor.mentor_tags?.map(mt => mt.tags.id) || [];
+    if (selectedIndustryIds.length > 0) {
+      if (mentorTagIds.some(id => selectedIndustryIds.includes(id))) {
+        matchScore += 50; // Major points for industry match
+      }
+    } else {
+      matchScore += 10; // Small boost for being in the pool if no industry is selected
+    }
+
+    return { ...mentor, matchScore };
+  });
+
+  // Sort all mentors by their calculated score
+  const sortedMentors = scoredMentors.sort((a, b) => b.matchScore - a.matchScore);
 
   // --- 4. RENDER THE UI ---
   return (
@@ -109,7 +122,7 @@ export default async function MentorsResultsPage({
           </div>
           <h1 className="text-3xl font-bold mb-2">Your Recommended Mentors</h1>
           <p className="text-gray-400">
-            Found {filteredMentors.length} mentor{filteredMentors.length !== 1 ? 's' : ''} matching your criteria
+            Found {sortedMentors.length} mentor{sortedMentors.length !== 1 ? 's' : ''} matching your criteria
           </p>
         </div>
       </div>
@@ -141,7 +154,7 @@ export default async function MentorsResultsPage({
         </div>
 
         {/* Results Grid */}
-        {filteredMentors.length === 0 ? (
+        {sortedMentors.length === 0 ? (
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold mb-4">No mentors found</h2>
             <p className="text-gray-400 mb-6">
@@ -153,7 +166,7 @@ export default async function MentorsResultsPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMentors.map((mentor) => (
+            {sortedMentors.map((mentor) => (
               <div key={mentor.id} className="bg-gray-900 rounded-lg p-6 hover:bg-gray-800 transition-colors">
                 {/* Profile Photo */}
                 <div className="text-center mb-4">
@@ -168,11 +181,16 @@ export default async function MentorsResultsPage({
                   {mentor.superpower && (
                     <p className="text-green-400 text-sm font-medium mt-1">{mentor.superpower}</p>
                   )}
-                  {mentor.rate_tier && (
-                    <span className="inline-block px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs font-medium mt-2">
-                      {mentor.rate_tier} per hour
+                  <div className="flex justify-center items-center">
+                    {mentor.rate_tier && (
+                      <span className="inline-block px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs font-medium mt-2">
+                        {mentor.rate_tier} per hour
+                      </span>
+                    )}
+                    <span className="inline-block ml-2 px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-xs font-medium mt-2">
+                      Score: {mentor.matchScore}
                     </span>
-                  )}
+                  </div>
                 </div>
 
                 {/* About */}
