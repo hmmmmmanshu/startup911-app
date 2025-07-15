@@ -8,14 +8,12 @@ type Tag = { id: number; name: string; type: string };
 type GroupedTags = { [key: string]: Tag[] };
 
 // Define the questions and the order they will appear in
-const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'REQUIREMENT', 'LOCATION', 'SOCIAL_IMPACT', 'SPECIAL_CATEGORY'];
+const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'DOCUMENTS_REQUIRED', 'PREFERENCES'];
 const QUESTION_TITLES: { [key: string]: string } = {
   STAGE: "What's your startup stage?",
   INDUSTRY: "Which industry are you in?",
-  REQUIREMENT: "Do you meet these requirements?",
-  LOCATION: "What's your primary location?",
-  SOCIAL_IMPACT: "Do you have a social impact focus?",
-  SPECIAL_CATEGORY: "Does your startup fall into any special categories?"
+  DOCUMENTS_REQUIRED: "What documents do you need?",
+  PREFERENCES: "What are your preferences?"
 };
 
 export default function GrantQuestionnaire({ groupedTags }: { groupedTags: GroupedTags }) {
@@ -53,7 +51,9 @@ export default function GrantQuestionnaire({ groupedTags }: { groupedTags: Group
   };
 
   const currentCategory = QUESTION_ORDER[currentStep];
-  const options = groupedTags[currentCategory] || [];
+  const categoryMappings: Record<string, string> = { DOCUMENTS_REQUIRED: 'REQUIREMENT', PREFERENCES: 'SOCIAL_IMPACT' };
+  const effectiveCategory = categoryMappings[currentCategory] || currentCategory;
+  const options = groupedTags[effectiveCategory] || [];
 
   return (
     <div className="bg-[#121212] text-white min-h-screen flex flex-col items-center justify-center p-4">
