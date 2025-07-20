@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { addToWaitlist } from '../../../../lib/supabase/queries'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,13 +22,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Create Supabase client
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('Missing Supabase environment variables')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
     // Add to waitlist
-    const result = await addToWaitlist(email, source || 'grant_snap_extension')
+    const { data, error } = await supabase
+      .from('waitlist')
+      .insert([
+        {
+          email: email.toLowerCase().trim(),
+          source: source || 'grant_snap_extension'
+        }
+      ])
+      .select()
+
+    if (error) {
+      // Check if it's a duplicate email error
+      if (error.code === '23505') {
+        return NextResponse.json(
+          { error: 'This email is already on the waitlist' },
+          { status: 409 }
+        )
+      }
+      console.error('Error adding to waitlist:', error)
+      return NextResponse.json(
+        { error: 'Failed to add email to waitlist. Please try again.' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(
       { 
         message: 'Successfully added to waitlist!',
-        data: result
+        data: data?.[0] || null
       },
       { status: 201 }
     )
@@ -36,16 +73,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Waitlist API error:', error)
     
-    // Handle known errors
-    if (error instanceof Error) {
-      if (error.message === 'This email is already on the waitlist') {
-        return NextResponse.json(
-          { error: 'This email is already on the waitlist' },
-          { status: 409 }
-        )
-      }
-    }
-
     return NextResponse.json(
       { error: 'Failed to add email to waitlist. Please try again.' },
       { status: 500 }
