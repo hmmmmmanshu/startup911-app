@@ -12,8 +12,8 @@ const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'DOCUMENTS_REQUIRED', 'PREFERENCES'
 const QUESTION_TITLES: { [key: string]: string } = {
   STAGE: "What's your startup stage?",
   INDUSTRY: "Which industry are you in?",
-  DOCUMENTS_REQUIRED: "What documents do you need?",
-  PREFERENCES: "What are your preferences?"
+  DOCUMENTS_REQUIRED: "What Prerequisites do you have?",
+  PREFERENCES: "Your Impact Area"
 };
 
 export default function GrantQuestionnaire({ groupedTags }: { groupedTags: GroupedTags }) {

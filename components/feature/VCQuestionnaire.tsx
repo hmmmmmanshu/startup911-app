@@ -8,12 +8,11 @@ type Tag = { id: number; name: string; type: string };
 type GroupedTags = { [key: string]: Tag[] };
 
 // Define the questions and the order they will appear in
-const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'LOCATION', 'INVESTMENT_TYPE'];
+const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'REGION'];
 const QUESTION_TITLES: Record<string, string> = {
   STAGE: "What's your startup's funding stage?",
   INDUSTRY: "Which industry do you operate in?",
-  LOCATION: "Which regions are you targeting for VCs?",
-  INVESTMENT_TYPE: "What type of investment are you looking for?"
+  REGION: "Which regions are you targeting for VCs?"
 };
 
 export default function VCQuestionnaire({ groupedTags }: { groupedTags: GroupedTags }) {
@@ -39,17 +38,8 @@ export default function VCQuestionnaire({ groupedTags }: { groupedTags: GroupedT
       const queryParts = Object.entries(selections)
         .filter(([, ids]) => ids.length > 0)
         .map(([key, ids]) => {
-          if (key === 'LOCATION') {
-            // For location, pass the region IDs (we'll handle country mapping in results page)
-            const regionIds = ids.map(id => {
-              const option = groupedTags[key]?.find(opt => opt.id === id);
-              return option?.id;
-            }).filter(Boolean);
-            return `${key.toLowerCase()}=${regionIds.join(',')}`;
-          } else {
-            // For other categories, pass the tag IDs
-            return `${key.toLowerCase()}=${ids.join(',')}`;
-          }
+          // For all categories, pass the tag IDs
+          return `${key.toLowerCase()}=${ids.join(',')}`;
         });
       
       router.push(`/vcs/results?${queryParts.join('&')}`);

@@ -7,13 +7,26 @@ import { useRouter } from 'next/navigation';
 type Tag = { id: number; name: string; type: string };
 
 // Define the questions and the order they will appear in
-const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'LOCATION', 'EXPERTISE'];
+const QUESTION_ORDER = ['INDUSTRY', 'LANGUAGE', 'BUDGET'];
 const QUESTION_TITLES: Record<string, string> = {
-  STAGE: "What's your startup stage?",
-  INDUSTRY: "Which industry are you in?",
-  LOCATION: "What type of mentorship do you prefer?",
-  EXPERTISE: "What specific expertise are you looking for?"
+  INDUSTRY: "Which industry expertise are you looking for?",
+  LANGUAGE: "Which languages should your mentor speak?",
+  BUDGET: "What's your budget for mentorship?"
 };
+
+// Hard-coded language options
+const LANGUAGE_OPTIONS = [
+  'English', 'Hindi', 'Bengali', 'Marathi', 'Telugu', 'Tamil', 'Gujarati', 'Urdu'
+];
+
+// Hard-coded budget options (matching database rate_tier values)
+const BUDGET_OPTIONS = [
+  'Free',
+  '<₹1K',
+  '₹1K-3K',
+  '₹3K-5K',
+  '₹5K+'
+];
 
 interface MentorQuestionnaireProps {
   groupedTags: Record<string, Tag[]>;
@@ -23,18 +36,10 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [selections, setSelections] = useState<Record<string, (string | number)[]>>({
-    STAGE: [],
     INDUSTRY: [],
-    LOCATION: [],
-    EXPERTISE: []
+    LANGUAGE: [],
+    BUDGET: []
   });
-
-  const handleStageSelection = (stage: string) => {
-    setSelections(prev => ({
-      ...prev,
-      STAGE: [stage]
-    }));
-  };
 
   const handleIndustrySelection = (tagId: number) => {
     setSelections(prev => {
@@ -46,24 +51,22 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
     });
   };
 
-  const handleLocationSelection = (location: string) => {
+  const handleLanguageSelection = (language: string) => {
     setSelections(prev => {
-      const currentSelections = prev.LOCATION || [];
-      const newSelections = currentSelections.includes(location)
-        ? currentSelections.filter(loc => loc !== location) // Deselect
-        : [...currentSelections, location]; // Select
-      return { ...prev, LOCATION: newSelections };
+      const currentSelections = prev.LANGUAGE || [];
+      const newSelections = currentSelections.includes(language)
+        ? currentSelections.filter(lang => lang !== language) // Deselect
+        : [...currentSelections, language]; // Select
+      return { ...prev, LANGUAGE: newSelections };
     });
   };
 
-  const handleExpertiseSelection = (expertise: string) => {
-    setSelections(prev => {
-      const currentSelections = prev.EXPERTISE || [];
-      const newSelections = currentSelections.includes(expertise)
-        ? currentSelections.filter(exp => exp !== expertise) // Deselect
-        : [...currentSelections, expertise]; // Select
-      return { ...prev, EXPERTISE: newSelections };
-    });
+  const handleBudgetSelection = (budget: string) => {
+    // Budget is single selection - replace any existing selection
+    setSelections(prev => ({
+      ...prev,
+      BUDGET: [budget]
+    }));
   };
 
   const handleNext = () => {
@@ -73,24 +76,19 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
       // Last step: Construct the query string and navigate
       const queryParts = [];
       
-      // Add stage selection (name)
-      if (selections.STAGE.length > 0) {
-        queryParts.push(`stage=${encodeURIComponent(selections.STAGE[0] as string)}`);
-      }
-      
       // Add industry selections (tag IDs)
       if (selections.INDUSTRY.length > 0) {
         queryParts.push(`industry=${selections.INDUSTRY.join(',')}`);
       }
       
-      // Add location selection (name)
-      if (selections.LOCATION.length > 0) {
-        queryParts.push(`location=${encodeURIComponent(selections.LOCATION[0] as string)}`);
+      // Add language selections (names)
+      if (selections.LANGUAGE.length > 0) {
+        queryParts.push(`language=${selections.LANGUAGE.join(',')}`);
       }
       
-      // Add expertise selection (name)
-      if (selections.EXPERTISE.length > 0) {
-        queryParts.push(`expertise=${encodeURIComponent(selections.EXPERTISE[0] as string)}`);
+      // Add budget selection (name)
+      if (selections.BUDGET.length > 0) {
+        queryParts.push(`budget=${encodeURIComponent(selections.BUDGET[0] as string)}`);
       }
       
       router.push(`/mentors/results?${queryParts.join('&')}`);
@@ -108,21 +106,12 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
   // Get options for current step
   const getCurrentOptions = () => {
     switch (currentCategory) {
-      case 'STAGE':
-        return [
-          { id: 'BEGINNER', name: 'Beginner' },
-          { id: 'INTERMEDIATE', name: 'Intermediate' },
-          { id: 'ADVANCED', name: 'Advanced' }
-        ];
       case 'INDUSTRY':
         return groupedTags.INDUSTRY || [];
-      case 'LOCATION':
-        return [
-          { id: 'REMOTE', name: 'Remote' },
-          { id: 'ONSITE', name: 'On-site' }
-        ];
-      case 'EXPERTISE':
-        return groupedTags.EXPERTISE || [];
+      case 'LANGUAGE':
+        return LANGUAGE_OPTIONS.map(lang => ({ id: lang, name: lang }));
+      case 'BUDGET':
+        return BUDGET_OPTIONS.map(budget => ({ id: budget, name: budget }));
       default:
         return [];
     }
@@ -139,17 +128,14 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
   // Handle selection based on current step
   const handleSelection = (optionId: string | number) => {
     switch (currentCategory) {
-      case 'STAGE':
-        handleStageSelection(optionId as string);
-        break;
       case 'INDUSTRY':
         handleIndustrySelection(optionId as number);
         break;
-      case 'LOCATION':
-        handleLocationSelection(optionId as string);
+      case 'LANGUAGE':
+        handleLanguageSelection(optionId as string);
         break;
-      case 'EXPERTISE':
-        handleExpertiseSelection(optionId as string);
+      case 'BUDGET':
+        handleBudgetSelection(optionId as string);
         break;
     }
   };
@@ -174,12 +160,12 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
           {QUESTION_TITLES[currentCategory]}
         </h2>
         <p className="text-center text-gray-400 mt-2">
-          {currentCategory === 'STAGE' ? 'Select one option' : 'Select all that apply'}
+          {currentCategory === 'BUDGET' ? 'Select one option' : 'Select all that apply'}
         </p>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           {options.map(option => {
-            const optionId = currentCategory === 'STAGE' ? (option as { id: string; name: string }).id : option.id;
+            const optionId = currentCategory === 'INDUSTRY' ? (option as Tag).id : option.id;
             const selected = isSelected(optionId);
             
             return (
