@@ -4,6 +4,13 @@ import type { Grant } from '../../../../lib/types';
 
 type PageProps = { searchParams: Promise<{ [key: string]: string | undefined }> };
 
+// Define a proper type for the tag structure
+type GrantTag = {
+  id: number;
+  name: string;
+  type: string;
+};
+
 const parseIds = (param: string | undefined) => param?.split(',').map(Number).filter(Boolean) || [];
 
 export default async function GrantsResultsPage({ searchParams }: PageProps) {
@@ -105,10 +112,10 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {sortedGrants.map(grant => {
                             // @ts-expect-error - Safely handling complex Supabase join types
-                            const grantTags = grant.grant_tags.map(gt => gt.tags);
-                            const stageTags = grantTags.filter((tag: any) => tag.type === 'STAGE');
-                            const industryTags = grantTags.filter((tag: any) => tag.type === 'INDUSTRY');
-                            const socialImpactTags = grantTags.filter((tag: any) => tag.type === 'SOCIAL_IMPACT');
+                            const grantTags = grant.grant_tags.map(gt => gt.tags) as GrantTag[];
+                            const stageTags = grantTags.filter((tag: GrantTag) => tag.type === 'STAGE');
+                            const industryTags = grantTags.filter((tag: GrantTag) => tag.type === 'INDUSTRY');
+                            const socialImpactTags = grantTags.filter((tag: GrantTag) => tag.type === 'SOCIAL_IMPACT');
                             
                             return (
                                 <div key={grant.id} className={`bg-gray-800 rounded-lg p-6 border ${grant.isEligible ? 'border-gray-700 hover:border-gray-600' : 'border-red-500/50'} transition-colors`}>
@@ -152,7 +159,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                         <div className="mb-4">
                                             <h3 className="text-white font-semibold text-sm mb-2">Stages:</h3>
                                             <div className="flex flex-wrap gap-1">
-                                                {stageTags.slice(0, 3).map((tag: any) => (
+                                                {stageTags.slice(0, 3).map((tag: GrantTag) => (
                                                     <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                                                         {tag.name}
                                                     </span>
@@ -171,7 +178,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                         <div className="mb-4">
                                             <h3 className="text-white font-semibold text-sm mb-2">Industries:</h3>
                                             <div className="flex flex-wrap gap-1">
-                                                {industryTags.slice(0, 3).map((tag: any) => (
+                                                {industryTags.slice(0, 3).map((tag: GrantTag) => (
                                                     <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                                                         {tag.name}
                                                     </span>
@@ -190,7 +197,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                         <div className="mb-6">
                                             <h3 className="text-white font-semibold text-sm mb-2">Impact Areas:</h3>
                                             <div className="flex flex-wrap gap-1">
-                                                {socialImpactTags.map((tag: any) => (
+                                                {socialImpactTags.map((tag: GrantTag) => (
                                                     <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                                                         {tag.name}
                                                     </span>

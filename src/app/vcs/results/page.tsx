@@ -6,6 +6,13 @@ import type { VC } from '../../../../lib/types'; // Import our defined VC type
 
 type PageProps = { searchParams: Promise<{ [key: string]: string | undefined }> };
 
+// Define a proper type for the tag structure
+type VCTag = {
+  id: number;
+  name: string;
+  type: string;
+};
+
 // Helper to safely parse numbers from the URL
 const parseIds = (param: string | undefined) => param?.split(',').map(Number).filter(Boolean) || [];
 
@@ -100,10 +107,10 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedVCs.map(vc => {
               // @ts-expect-error - Safely handling complex Supabase join types
-              const vcTags = vc.vc_tags.map(vt => vt.tags);
-              const stageTags = vcTags.filter((tag: any) => tag.type === null && ['Angel', 'Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Series C+', 'Pre-Series A'].includes(tag.name));
-              const industryTags = vcTags.filter((tag: any) => tag.type === null && !['Angel', 'Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Series C+', 'Pre-Series A'].includes(tag.name));
-              const regionTags = vcTags.filter((tag: any) => tag.type === 'REGION');
+              const vcTags = vc.vc_tags.map(vt => vt.tags) as VCTag[];
+              const stageTags = vcTags.filter((tag: VCTag) => tag.type === null && ['Angel', 'Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Series C+', 'Pre-Series A'].includes(tag.name));
+              const industryTags = vcTags.filter((tag: VCTag) => tag.type === null && !['Angel', 'Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Series C+', 'Pre-Series A'].includes(tag.name));
+              const regionTags = vcTags.filter((tag: VCTag) => tag.type === 'REGION');
               
               return (
                 <div key={vc.id} className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors">
@@ -133,7 +140,7 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
                     <div className="mb-4">
                       <h3 className="text-white font-semibold text-sm mb-2">Investment Stages:</h3>
                       <div className="flex flex-wrap gap-1">
-                        {stageTags.slice(0, 3).map((tag: any) => (
+                        {stageTags.slice(0, 3).map((tag: VCTag) => (
                           <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                             {tag.name}
                           </span>
@@ -152,7 +159,7 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
                     <div className="mb-4">
                       <h3 className="text-white font-semibold text-sm mb-2">Industries:</h3>
                       <div className="flex flex-wrap gap-1">
-                        {industryTags.slice(0, 3).map((tag: any) => (
+                        {industryTags.slice(0, 3).map((tag: VCTag) => (
                           <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                             {tag.name}
                           </span>
@@ -171,7 +178,7 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
                     <div className="mb-6">
                       <h3 className="text-white font-semibold text-sm mb-2">Regions:</h3>
                       <div className="flex flex-wrap gap-1">
-                        {regionTags.map((tag: any) => (
+                        {regionTags.map((tag: VCTag) => (
                           <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                             {tag.name}
                           </span>
