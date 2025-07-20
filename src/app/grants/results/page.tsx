@@ -29,7 +29,6 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
     const scoredGrants = grants.map(grant => {
         let matchScore = 0;
         let isEligible = true;
-        const requirementsMet = new Set<string>();
 
         // Positive scoring for tag matches
         // @ts-expect-error - Handling complex Supabase join types safely

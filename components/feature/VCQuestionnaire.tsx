@@ -16,16 +16,6 @@ const QUESTION_TITLES: Record<string, string> = {
   INVESTMENT_TYPE: "What type of investment are you looking for?"
 };
 
-function calculateScore(answers: Record<string, number[]>, vc: any) {
-  let score = 0;
-  // Logic to calculate score based on answers and VC profile
-  // This is a placeholder. In a real app, you'd compare answers with VC's criteria.
-  // For example, if VC specializes in Series A, and the user selected Series A, score += 10.
-  // If VC is based in Silicon Valley, and the user selected Silicon Valley, score += 5.
-  // You'd iterate through all answers and add points.
-  return score;
-}
-
 export default function VCQuestionnaire({ groupedTags }: { groupedTags: GroupedTags }) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);

@@ -8,21 +8,12 @@ type Tag = { id: number; name: string; type: string };
 
 // Define the questions and the order they will appear in
 const QUESTION_ORDER = ['STAGE', 'INDUSTRY', 'LOCATION', 'EXPERTISE'];
-const QUESTION_TITLES: { [key: string]: string } = {
-  STAGE: "What's your current stage?",
-  INDUSTRY: "Which industry expertise are you looking for?",
-  LOCATION: "Where do you prefer your mentor to be located?",
+const QUESTION_TITLES: Record<string, string> = {
+  STAGE: "What's your startup stage?",
+  INDUSTRY: "Which industry are you in?",
+  LOCATION: "What type of mentorship do you prefer?",
   EXPERTISE: "What specific expertise are you looking for?"
 };
-
-// Hard-coded budget options (matching database rate_tier values)
-const BUDGET_OPTIONS = [
-  'Free',
-  '<₹1K',
-  '₹1K-3K',
-  '₹3K-5K',
-  '₹5K+'
-];
 
 interface MentorQuestionnaireProps {
   groupedTags: Record<string, Tag[]>;
