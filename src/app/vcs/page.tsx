@@ -39,9 +39,10 @@ export default async function VCsPage() {
   // Group the tags into categories
   const groupedTags = groupTagsByType(tags);
 
-  // After fetching tags
-  const { data: countriesData } = await supabase.from('vcs').select('country_based_of').distinct();
-  const countries = countriesData?.map(d => d.country_based_of).filter(Boolean).sort() || [];
+  // After fetching tags - get all countries and make them distinct
+  const { data: countriesData } = await supabase.from('vcs').select('country_based_of');
+  const allCountries = countriesData?.map(d => d.country_based_of).filter(Boolean) || [];
+  const countries = [...new Set(allCountries)].sort();
 
   // Render our wizard component and pass it the data
   return <VCQuestionnaire groupedTags={groupedTags} countries={countries} />;

@@ -14,11 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Startup911',
-  description: 'The ultimate toolkit for Entrepreneurs.',
-  icons: {
-    icon: '/logo.svg',
+  title: {
+    template: '%s | startup911.in',
+    default: 'startup911.in | Grants, VCs, and Mentors for Indian Startups',
   },
+  description: "Your guide to the Indian startup ecosystem. Find funding, mentorship, and resources to grow your company.",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
