@@ -28,8 +28,6 @@ export default function HomePage() {
           </span>
         </h1>
         <p className="mt-6 text-lg text-gray-400 max-w-2xl">
-          The ultimate toolkit for Entrepreneurs.
-          <br />
           Find grants, VCs, and mentors without friction.
         </p>
 
