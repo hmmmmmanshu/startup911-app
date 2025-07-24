@@ -23,14 +23,12 @@ export default function Header() {
             Blogs
           </Link>
           <div className="w-px h-6 bg-white/20 mx-2"></div>
-          <a
-            href="https://snap-grant-launchpad.lovable.app/"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/grant-snap"
             className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-300"
           >
             Grant Snap
-          </a>
+          </Link>
         </div>
       </nav>
     </header>
