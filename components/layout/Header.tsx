@@ -6,17 +6,19 @@ export default function Header() {
   return (
     <header className="bg-[#121212] sticky top-0 z-50 border-b border-white/10">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center space-x-3">
-          {/* Real SVG Logo */}
-          <Image
-            src="/logo.svg"
-            alt="startup911.in logo"
-            width={32}
-            height={32}
-          />
-          <span className="text-xl font-semibold text-white">
-            startup911.in
-          </span>
+        <Link href="/" className="flex flex-col items-start space-x-0">
+          <div className="flex items-center space-x-3">
+            <Image
+              src="/logo.png"
+              alt="Startup911 logo"
+              width={32}
+              height={32}
+            />
+            <span className="text-xl font-semibold text-white">
+              Startup911
+            </span>
+          </div>
+          <span className="text-xs text-gray-400 ml-11 -mt-1">Your Virtual CFO from Day 1</span>
         </Link>
         <div className="hidden md:flex items-center space-x-1">
           <Link href="/blog" className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-300">
