@@ -22,16 +22,22 @@ export const metadata: Metadata = {
   description: "Your guide to the Indian startup ecosystem. Find funding, mentorship, and resources to grow your company.",
   icons: {
     icon: [
-      { url: '/logo.png', sizes: 'any', type: 'image/png' }
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
     ],
     apple: [
-      { url: '/logo.png', sizes: '180x180', type: 'image/png' }
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
     ],
-    other: [
-      { url: '/logo.png', sizes: '512x512', type: 'image/png' }
-    ],
+    shortcut: '/favicon.ico',
   },
   manifest: '/site.webmanifest',
+  other: {
+    'msapplication-TileColor': '#000000',
+    'theme-color': '#000000',
+  },
 };
 
 export default function RootLayout({
@@ -41,6 +47,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="msapplication-TileColor" content="#000000" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
