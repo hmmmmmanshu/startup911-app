@@ -1,0 +1,25 @@
+{
+    "mcpServers": {
+      "supabase-grantsnap": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase@latest",
+          "--project-ref",
+          "uurdubbsamdawncqkaoy"
+        ],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "sbp_3fcbddb1b39fa470701294c02c8e361fcbafb93a"
+        },
+        "description": "Official Supabase MCP server for Grant Snap database access"
+      },
+      "postgres-grantsnap": {
+        "command": "npx",
+        "args": [
+          "@modelcontextprotocol/server-postgres",
+          "postgresql://postgres:[password]@db.uurdubbsamdawncqkaoy.supabase.co:5432/postgres"
+        ],
+        "description": "Direct PostgreSQL connection to Grant Snap Supabase database"
+      }
+    }
+  }
