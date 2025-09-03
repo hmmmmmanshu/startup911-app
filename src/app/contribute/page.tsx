@@ -517,6 +517,9 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
     linkedin_url: '',
     calendly_url: '',
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const availableLanguages = [
     'English', 'Hindi', 'Bengali', 'Marathi', 'Telugu', 'Tamil', 
@@ -543,6 +546,63 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
     }));
   };
 
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please select a JPG or PNG file.');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB.');
+      return;
+    }
+
+    setPhotoFile(file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPhotoPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload photo
+    setUploadingPhoto(true);
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('photo', file);
+
+      const response = await fetch('/api/upload-photo', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setFormData(prev => ({ ...prev, photo_url: result.photo_url }));
+      } else {
+        alert(result.error || 'Failed to upload photo');
+        setPhotoFile(null);
+        setPhotoPreview('');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload photo. Please try again.');
+      setPhotoFile(null);
+      setPhotoPreview('');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6 text-green-400">Mentor Profile Information</h2>
@@ -565,15 +625,52 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Photo URL
+              Profile Photo
             </label>
-            <input
-              type="url"
-              value={formData.photo_url}
-              onChange={(e) => handleInputChange('photo_url', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
-              placeholder="https://example.com/photo.jpg"
-            />
+            
+            {/* Photo Preview */}
+            {(photoPreview || formData.photo_url) && (
+              <div className="mb-4">
+                <div className="relative w-24 h-24 mx-auto">
+                  <img
+                    src={photoPreview || formData.photo_url}
+                    alt="Profile preview"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-green-500/30"
+                  />
+                  {uploadingPhoto && (
+                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                      <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full"></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* File Upload */}
+            <div className="space-y-3">
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png"
+                onChange={handlePhotoChange}
+                disabled={uploadingPhoto}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700 focus:border-green-500 focus:outline-none disabled:opacity-50"
+              />
+              
+              {/* Fallback URL input */}
+              <div className="text-center text-gray-400 text-sm">or</div>
+              
+              <input
+                type="url"
+                value={formData.photo_url}
+                onChange={(e) => handleInputChange('photo_url', e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
+                placeholder="https://example.com/photo.jpg"
+              />
+            </div>
+            
+            <p className="text-xs text-gray-400 mt-2">
+              Upload a JPG or PNG file (max 5MB) or provide a URL
+            </p>
           </div>
         </div>
 

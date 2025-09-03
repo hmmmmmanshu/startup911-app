@@ -143,112 +143,165 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                             const socialImpactTags = grantTags.filter((tag: GrantTag) => tag.type === 'SOCIAL_IMPACT');
                             
                             return (
-                                <div key={grant.id} className={`bg-gray-800 rounded-lg p-6 border ${
+                                <div key={grant.id} className={`group relative bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${
                                     searchType === 'simple' 
-                                        ? 'border-gray-700 hover:border-gray-600' 
+                                        ? 'border-gray-700/50 hover:border-green-500/30 hover:shadow-green-500/10' 
                                         : grant.isEligible 
-                                            ? 'border-gray-700 hover:border-gray-600' 
-                                            : 'border-red-500/50'
-                                } transition-colors`}>
-                                    {/* Top Section */}
-                                    <div className="mb-4">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <h2 className="text-xl font-bold text-white">{grant.name}</h2>
-                                            <div className={`px-3 py-1 rounded-full text-sm font-semibold ${grant.isEligible ? 'bg-purple-500 text-white' : 'bg-red-500 text-white'}`}>
-                                                Score: {grant.matchScore}
-                                            </div>
+                                            ? 'border-gray-700/50 hover:border-green-500/30 hover:shadow-green-500/10' 
+                                            : 'border-red-500/30 hover:border-red-400/50'
+                                }`}>
+                                    {/* Score Badge */}
+                                    <div className="absolute -top-2 -right-2">
+                                        <div className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg ${
+                                            grant.matchScore >= 50 
+                                                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                                                : grant.matchScore >= 25
+                                                    ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white'
+                                                    : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                                        }`}>
+                                            {grant.matchScore}
                                         </div>
+                                    </div>
+
+                                    {/* Header Section */}
+                                    <div className="mb-6">
+                                        <h2 className="text-xl font-bold text-white mb-2 leading-tight group-hover:text-green-400 transition-colors">
+                                            {grant.name}
+                                        </h2>
                                         
-                                        <p className="text-green-400 text-sm font-medium mb-2">
-                                            {grant.organization}
-                                        </p>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                            <p className="text-green-400 text-sm font-medium">
+                                                {grant.organization}
+                                            </p>
+                                        </div>
 
                                         {searchType === 'advanced' && !grant.isEligible && (
-                                            <p className="text-sm text-red-400 bg-red-500/10 p-2 rounded-md mb-2">
-                                                ⚠️ Eligibility requirements may not be met
-                                            </p>
+                                            <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl mb-3">
+                                                <div className="w-5 h-5 text-red-400">⚠️</div>
+                                                <p className="text-sm text-red-400 font-medium">
+                                                    Eligibility requirements may not be met
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
 
                                     {/* Description */}
-                                    <p className="text-gray-300 text-sm mb-4 leading-relaxed line-clamp-3">
-                                        {grant.details}
-                                    </p>
+                                    <div className="mb-6">
+                                        <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
+                                            {grant.details}
+                                        </p>
+                                    </div>
 
                                     {/* Grant Amount */}
                                     {grant.amount_max && (
-                                        <div className="mb-4">
-                                            <h3 className="text-white font-semibold text-sm mb-2">Grant Amount:</h3>
-                                            <span className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm border border-green-500/30">
-                                                {grant.amount_max}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {/* Stages */}
-                                    {stageTags.length > 0 && (
-                                        <div className="mb-4">
-                                            <h3 className="text-white font-semibold text-sm mb-2">Stages:</h3>
-                                            <div className="flex flex-wrap gap-1">
-                                                {stageTags.slice(0, 3).map((tag: GrantTag) => (
-                                                    <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                                                        {tag.name}
-                                                    </span>
-                                                ))}
-                                                {stageTags.length > 3 && (
-                                                    <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                                                        +{stageTags.length - 3} more
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Industries */}
-                                    {industryTags.length > 0 && (
-                                        <div className="mb-4">
-                                            <h3 className="text-white font-semibold text-sm mb-2">Industries:</h3>
-                                            <div className="flex flex-wrap gap-1">
-                                                {industryTags.slice(0, 3).map((tag: GrantTag) => (
-                                                    <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                                                        {tag.name}
-                                                    </span>
-                                                ))}
-                                                {industryTags.length > 3 && (
-                                                    <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                                                        +{industryTags.length - 3} more
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Impact Areas */}
-                                    {socialImpactTags.length > 0 && (
                                         <div className="mb-6">
-                                            <h3 className="text-white font-semibold text-sm mb-2">Impact Areas:</h3>
-                                            <div className="flex flex-wrap gap-1">
-                                                {socialImpactTags.map((tag: GrantTag) => (
-                                                    <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                                                        {tag.name}
-                                                    </span>
-                                                ))}
+                                            <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                                        <span className="text-green-400 text-sm">💰</span>
+                                                    </div>
+                                                    <h3 className="text-white font-semibold text-sm">Grant Amount</h3>
+                                                </div>
+                                                <p className="text-green-300 text-sm font-medium">
+                                                    {grant.amount_max}
+                                                </p>
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* Tags Section */}
+                                    <div className="space-y-4 mb-6">
+                                        {/* Stages */}
+                                        {stageTags.length > 0 && (
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="w-5 h-5 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                                        <span className="text-blue-400 text-xs">🚀</span>
+                                                    </div>
+                                                    <h3 className="text-white font-semibold text-sm">Stages</h3>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {stageTags.slice(0, 3).map((tag: GrantTag) => (
+                                                        <span key={tag.id} className="bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-blue-500/30">
+                                                            {tag.name}
+                                                        </span>
+                                                    ))}
+                                                    {stageTags.length > 3 && (
+                                                        <span className="bg-gray-500/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-500/30">
+                                                            +{stageTags.length - 3} more
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Industries */}
+                                        {industryTags.length > 0 && (
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="w-5 h-5 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                                        <span className="text-purple-400 text-xs">🏭</span>
+                                                    </div>
+                                                    <h3 className="text-white font-semibold text-sm">Industries</h3>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {industryTags.slice(0, 3).map((tag: GrantTag) => (
+                                                        <span key={tag.id} className="bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-purple-500/30">
+                                                            {tag.name}
+                                                        </span>
+                                                    ))}
+                                                    {industryTags.length > 3 && (
+                                                        <span className="bg-gray-500/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-500/30">
+                                                            +{industryTags.length - 3} more
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Impact Areas */}
+                                        {socialImpactTags.length > 0 && (
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="w-5 h-5 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                                                        <span className="text-emerald-400 text-xs">🌱</span>
+                                                    </div>
+                                                    <h3 className="text-white font-semibold text-sm">Impact Areas</h3>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {socialImpactTags.map((tag: GrantTag) => (
+                                                        <span key={tag.id} className="bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-500/30">
+                                                            {tag.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {/* Action Buttons */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <a 
                                             href={grant.application_link || '#'} 
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="block w-full bg-green-500 text-white text-center py-2 px-4 rounded-lg font-semibold hover:bg-green-400 transition-colors"
+                                            className="group/btn block w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center py-3 px-4 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-green-500/25 hover:scale-[1.02]"
                                         >
-                                            Apply Now
+                                            <span className="flex items-center justify-center gap-2">
+                                                Apply Now
+                                                <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                            </span>
                                         </a>
-                                        <button className="block w-full bg-blue-500 text-white text-center py-2 px-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors">
-                                            Learn More
+                                        <button className="group/btn block w-full bg-gray-700/50 text-gray-300 text-center py-3 px-4 rounded-xl font-semibold hover:bg-gray-600/50 hover:text-white transition-all duration-200 border border-gray-600/50 hover:border-gray-500/50">
+                                            <span className="flex items-center justify-center gap-2">
+                                                Learn More
+                                                <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </span>
                                         </button>
                                     </div>
                                 </div>
