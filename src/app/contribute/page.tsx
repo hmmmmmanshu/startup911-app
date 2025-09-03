@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Briefcase, Brain, Handshake, CheckCircle, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 
 // Submission type definition
 type SubmissionType = 'grant' | 'vc' | 'mentor';
@@ -517,7 +518,6 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
     linkedin_url: '',
     calendly_url: '',
   });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
@@ -564,8 +564,6 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
       return;
     }
 
-    setPhotoFile(file);
-    
     // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -590,13 +588,11 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
         setFormData(prev => ({ ...prev, photo_url: result.photo_url }));
       } else {
         alert(result.error || 'Failed to upload photo');
-        setPhotoFile(null);
         setPhotoPreview('');
       }
     } catch (error) {
       console.error('Upload error:', error);
       alert('Failed to upload photo. Please try again.');
-      setPhotoFile(null);
       setPhotoPreview('');
     } finally {
       setUploadingPhoto(false);
@@ -632,9 +628,11 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
             {(photoPreview || formData.photo_url) && (
               <div className="mb-4">
                 <div className="relative w-24 h-24 mx-auto">
-                  <img
+                  <Image
                     src={photoPreview || formData.photo_url}
                     alt="Profile preview"
+                    width={96}
+                    height={96}
                     className="w-24 h-24 rounded-full object-cover border-2 border-green-500/30"
                   />
                   {uploadingPhoto && (

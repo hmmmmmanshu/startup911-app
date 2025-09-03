@@ -73,40 +73,37 @@ export default function GrantQuestionnaire({ groupedTags }: { groupedTags: Group
         ))}
       </div>
 
-      {/* Search Type Toggle */}
-      <div className="mb-8">
-        <div className="bg-[#1C1C1E] rounded-xl p-4 border border-gray-800 max-w-md">
-          <h3 className="text-white font-semibold mb-3 text-center">Search Type</h3>
-          <div className="flex bg-gray-800 rounded-lg p-1">
-            <button
-              onClick={() => setSearchType('simple')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                searchType === 'simple'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Simple Search
-            </button>
-            <button
-              onClick={() => setSearchType('advanced')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                searchType === 'advanced'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Advanced Search
-            </button>
-          </div>
-          <p className="text-xs text-gray-400 mt-2 text-center">
-            {searchType === 'simple' 
-              ? 'Focus on stage, industry & preferences only' 
-              : 'Include strict eligibility requirements'
-            }
-          </p>
-        </div>
-      </div>
+                  {/* Search Type Toggle */}
+            <div className="mb-8 flex flex-col items-center">
+              <div className="inline-flex bg-gray-800/50 backdrop-blur-sm rounded-full p-1 border border-gray-700/50">
+                <button
+                  onClick={() => setSearchType('simple')}
+                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    searchType === 'simple'
+                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                  }`}
+                >
+                  Simple Search
+                </button>
+                <button
+                  onClick={() => setSearchType('advanced')}
+                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    searchType === 'advanced'
+                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                  }`}
+                >
+                  Advanced Search
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-3 text-center max-w-sm">
+                {searchType === 'simple' 
+                  ? 'Focus on stage, industry & preferences only' 
+                  : 'Include strict eligibility requirements'
+                }
+              </p>
+            </div>
 
       {/* Main Question Card */}
       <div className="bg-[#1C1C1E] rounded-2xl p-8 max-w-2xl w-full border border-gray-800">

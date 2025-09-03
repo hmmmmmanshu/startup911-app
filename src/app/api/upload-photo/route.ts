@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('mentor-photos')
       .upload(filePath, buffer, {
         contentType: file.type,
