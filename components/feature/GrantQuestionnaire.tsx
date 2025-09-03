@@ -20,6 +20,7 @@ export default function GrantQuestionnaire({ groupedTags }: { groupedTags: Group
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [selections, setSelections] = useState<Record<string, number[]>>({});
+  const [searchType, setSearchType] = useState<'simple' | 'advanced'>('simple');
 
   const handleSelection = (category: string, tagId: number) => {
     setSelections(prev => {
@@ -39,6 +40,9 @@ export default function GrantQuestionnaire({ groupedTags }: { groupedTags: Group
       const queryParts = Object.entries(selections)
         .filter(([, ids]) => ids.length > 0)
         .map(([key, ids]) => `${key.toLowerCase()}=${ids.join(',')}`);
+      
+      // Add search type parameter
+      queryParts.push(`search_type=${searchType}`);
       
       router.push(`/grants/results?${queryParts.join('&')}`);
     }
@@ -67,6 +71,41 @@ export default function GrantQuestionnaire({ groupedTags }: { groupedTags: Group
             }`}
           />
         ))}
+      </div>
+
+      {/* Search Type Toggle */}
+      <div className="mb-8">
+        <div className="bg-[#1C1C1E] rounded-xl p-4 border border-gray-800 max-w-md">
+          <h3 className="text-white font-semibold mb-3 text-center">Search Type</h3>
+          <div className="flex bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setSearchType('simple')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                searchType === 'simple'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Simple Search
+            </button>
+            <button
+              onClick={() => setSearchType('advanced')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                searchType === 'advanced'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Advanced Search
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 mt-2 text-center">
+            {searchType === 'simple' 
+              ? 'Focus on stage, industry & preferences only' 
+              : 'Include strict eligibility requirements'
+            }
+          </p>
+        </div>
       </div>
 
       {/* Main Question Card */}

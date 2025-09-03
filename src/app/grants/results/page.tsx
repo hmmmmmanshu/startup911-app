@@ -20,6 +20,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
     const selectedIndustryIds = parseIds(params.industry);
     const selectedDocumentsRequiredIds = parseIds(params.documents_required);
     const selectedPreferencesIds = parseIds(params.preferences);
+    const searchType = params.search_type || 'simple';
 
     const { data: grantsData, error: grantsError } = await supabase.from('grants').select('*, grant_tags(tags(id, name, type))');
     const { data: allTagsData, error: tagsError } = await supabase.from('tags').select('id, name');
@@ -35,24 +36,35 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
         let matchScore = 0;
         let isEligible = true;
 
-        // Positive scoring for tag matches
+        // Positive scoring for tag matches (same for both search types)
         // @ts-expect-error - Handling complex Supabase join types safely
         const grantTagIds = grant.grant_tags.map(gt => gt.tags.id);
         if (selectedStageIds.some(id => grantTagIds.includes(id))) matchScore += 25;
         if (selectedIndustryIds.some(id => grantTagIds.includes(id))) matchScore += 25;
         if (selectedPreferencesIds.some(id => grantTagIds.includes(id))) matchScore += 10;
         
-        // Check hard requirements (prerequisites)
-        const userHasRequirement = (name: string) => selectedDocumentsRequiredIds.some(id => requirementMap.get(id) === name);
-        if (grant.dpiit_required && !userHasRequirement('DPIIT Registration')) isEligible = false;
-        if (grant.patent_required && !userHasRequirement('Patent/IP')) isEligible = false;
-        if (grant.prototype_required && !userHasRequirement('Working Prototype')) isEligible = false;
-        if (grant.technical_cofounder_required && !userHasRequirement('Technical Co-founder')) isEligible = false;
-        if (grant.full_time_commitment && !userHasRequirement('Full-time Commitment')) isEligible = false;
+        // Add recency bias - newer grants get a small boost
+        const daysSinceCreated = Math.floor((Date.now() - new Date(grant.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        if (daysSinceCreated <= 30) matchScore += 5; // Recent grants (last 30 days) get +5 points
+        else if (daysSinceCreated <= 90) matchScore += 2; // Semi-recent grants (last 90 days) get +2 points
+        
+        // Handle eligibility based on search type
+        if (searchType === 'advanced') {
+            // Advanced search: Apply strict eligibility requirements
+            const userHasRequirement = (name: string) => selectedDocumentsRequiredIds.some(id => requirementMap.get(id) === name);
+            if (grant.dpiit_required && !userHasRequirement('DPIIT Registration')) isEligible = false;
+            if (grant.patent_required && !userHasRequirement('Patent/IP')) isEligible = false;
+            if (grant.prototype_required && !userHasRequirement('Working Prototype')) isEligible = false;
+            if (grant.technical_cofounder_required && !userHasRequirement('Technical Co-founder')) isEligible = false;
+            if (grant.full_time_commitment && !userHasRequirement('Full-time Commitment')) isEligible = false;
 
-        // If not eligible, apply a heavy penalty to push it down the list
-        if (!isEligible) {
-            matchScore -= 100;
+            // If not eligible, apply a heavy penalty to push it down the list
+            if (!isEligible) {
+                matchScore -= 100;
+            }
+        } else {
+            // Simple search: Ignore hard eligibility filters, just show all grants
+            isEligible = true;
         }
 
         return { ...grant, matchScore, isEligible };
@@ -84,7 +96,14 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                 {/* Search Criteria Section */}
                 <div className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800">
                     <h2 className="text-white font-semibold mb-3">Your Search Criteria:</h2>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            searchType === 'simple' 
+                                ? 'bg-blue-500 text-white' 
+                                : 'bg-purple-500 text-white'
+                        }`}>
+                            {searchType === 'simple' ? 'Simple Search' : 'Advanced Search'}
+                        </span>
                         {selectedStageIds.length > 0 && (
                             <span className="text-green-400">Stage Match: Selected</span>
                         )}
@@ -98,6 +117,12 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                             <span className="text-green-400">Impact Area: Selected</span>
                         )}
                     </div>
+                    <p className="text-sm text-gray-400">
+                        {searchType === 'simple' 
+                            ? 'Showing grants based on stage, industry, and preferences only. Eligibility requirements are not strictly enforced.'
+                            : 'Showing grants with strict eligibility filtering. Grants that don\'t meet requirements are heavily penalized.'
+                        }
+                    </p>
                 </div>
 
                 {sortedGrants.length === 0 ? (
@@ -118,7 +143,13 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                             const socialImpactTags = grantTags.filter((tag: GrantTag) => tag.type === 'SOCIAL_IMPACT');
                             
                             return (
-                                <div key={grant.id} className={`bg-gray-800 rounded-lg p-6 border ${grant.isEligible ? 'border-gray-700 hover:border-gray-600' : 'border-red-500/50'} transition-colors`}>
+                                <div key={grant.id} className={`bg-gray-800 rounded-lg p-6 border ${
+                                    searchType === 'simple' 
+                                        ? 'border-gray-700 hover:border-gray-600' 
+                                        : grant.isEligible 
+                                            ? 'border-gray-700 hover:border-gray-600' 
+                                            : 'border-red-500/50'
+                                } transition-colors`}>
                                     {/* Top Section */}
                                     <div className="mb-4">
                                         <div className="flex items-start justify-between mb-2">
@@ -132,7 +163,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                             {grant.organization}
                                         </p>
 
-                                        {!grant.isEligible && (
+                                        {searchType === 'advanced' && !grant.isEligible && (
                                             <p className="text-sm text-red-400 bg-red-500/10 p-2 rounded-md mb-2">
                                                 ⚠️ Eligibility requirements may not be met
                                             </p>
