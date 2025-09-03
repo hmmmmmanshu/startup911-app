@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { CheckCircle, XCircle, Clock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   const moderateSubmission = async (submissionId: string, action: 'approve' | 'reject') => {
     try {
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold text-white">
-                          {submission.submission_data.name || 'Untitled Submission'}
+                          {String(submission.submission_data.name) || 'Untitled Submission'}
                         </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-400">
                           <span className={`font-medium ${getSubmissionTypeColor(submission.submission_type)}`}>
