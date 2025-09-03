@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     let requestData: ModerateRequest;
     try {
       requestData = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     if (requestData.action === 'approve') {
       // Handle approval
-      const submissionData = submission.submission_data as Record<string, any>;
+      const submissionData = submission.submission_data as Record<string, unknown>;
       const submissionType = submission.submission_type as 'grant' | 'vc' | 'mentor' | 'incubation_centre' | 'post';
 
       let insertResult;
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
 
     // Update submission status
     const newStatus = requestData.action === 'approve' ? 'approved' : 'rejected';
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       status: newStatus,
       reviewed_by: user.id,
       reviewed_at: new Date().toISOString(),

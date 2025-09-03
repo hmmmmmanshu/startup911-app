@@ -18,7 +18,7 @@ export default function ContributePage() {
   const [selectedType, setSelectedType] = useState<SubmissionType>('grant');
   const [submissionState, setSubmissionState] = useState<SubmissionState>({ status: 'idle' });
 
-  const handleSubmission = async (formData: Record<string, any>) => {
+  const handleSubmission = async (formData: Record<string, unknown>) => {
     setSubmissionState({ status: 'submitting' });
 
     try {
@@ -47,7 +47,7 @@ export default function ContributePage() {
           message: result.error || 'Failed to submit contribution',
         });
       }
-    } catch (error) {
+    } catch {
       setSubmissionState({
         status: 'error',
         message: 'Network error. Please try again.',
@@ -184,7 +184,7 @@ export default function ContributePage() {
 }
 
 // Grant Form Component
-function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => void }) {
+function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => void }) {
   const [formData, setFormData] = useState({
     name: '',
     organization: '',
@@ -211,7 +211,7 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => void
     onSubmit(formData);
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -348,7 +348,7 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => void
 }
 
 // VC Form Component
-function VCForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => void }) {
+function VCForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => void }) {
   const [formData, setFormData] = useState({
     name: '',
     website: '',
@@ -506,7 +506,7 @@ function VCForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => void })
 }
 
 // Mentor Form Component
-function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => void }) {
+function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => void }) {
   const [formData, setFormData] = useState({
     name: '',
     photo_url: '',
@@ -530,7 +530,7 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, any>) => voi
     onSubmit(formData);
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

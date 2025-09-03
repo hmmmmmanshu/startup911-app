@@ -7,7 +7,7 @@ import { CheckCircle, XCircle, Clock, Eye, EyeOff, RefreshCw } from 'lucide-reac
 interface Submission {
   id: string;
   submission_type: 'grant' | 'vc' | 'mentor' | 'incubation_centre' | 'post';
-  submission_data: Record<string, any>;
+  submission_data: Record<string, unknown>;
   status: 'pending_review' | 'approved' | 'rejected' | 'needs_revision';
   notes?: string;
   reviewed_by?: string;
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchSubmissions();
-  }, []);
+  }, [fetchSubmissions]);
 
   return (
     <div className="bg-black text-white min-h-screen">

@@ -31,7 +31,7 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         // Login
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -52,7 +52,7 @@ export default function AuthPage() {
         }
       } else {
         // Signup
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -79,7 +79,7 @@ export default function AuthPage() {
           setIsLogin(true);
         }
       }
-    } catch (error) {
+    } catch {
       setAuthState({
         status: 'error',
         message: 'An unexpected error occurred. Please try again.',
@@ -213,7 +213,7 @@ export default function AuthPage() {
               <li>2. Check your email and confirm your account</li>
               <li>3. Run this SQL command in your Supabase dashboard:</li>
               <li className="font-mono bg-gray-800 p-2 rounded mt-2">
-                SELECT public.promote_to_admin('your-email@example.com');
+                SELECT public.promote_to_admin(&apos;your-email@example.com&apos;);
               </li>
               <li>4. Refresh this page and login</li>
             </ol>
