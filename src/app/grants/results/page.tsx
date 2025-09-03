@@ -35,18 +35,32 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
     const scoredGrants = grants.map(grant => {
         let matchScore = 0;
         let isEligible = true;
+        let hasAnyMatch = false;
 
         // Positive scoring for tag matches (same for both search types)
         // @ts-expect-error - Handling complex Supabase join types safely
         const grantTagIds = grant.grant_tags.map(gt => gt.tags.id);
-        if (selectedStageIds.some(id => grantTagIds.includes(id))) matchScore += 25;
-        if (selectedIndustryIds.some(id => grantTagIds.includes(id))) matchScore += 25;
-        if (selectedPreferencesIds.some(id => grantTagIds.includes(id))) matchScore += 10;
         
-        // Add recency bias - newer grants get a small boost
-        const daysSinceCreated = Math.floor((Date.now() - new Date(grant.created_at).getTime()) / (1000 * 60 * 60 * 24));
-        if (daysSinceCreated <= 30) matchScore += 5; // Recent grants (last 30 days) get +5 points
-        else if (daysSinceCreated <= 90) matchScore += 2; // Semi-recent grants (last 90 days) get +2 points
+        // Check for matches and only add to score if there are actual matches
+        if (selectedStageIds.some(id => grantTagIds.includes(id))) {
+            matchScore += 25;
+            hasAnyMatch = true;
+        }
+        if (selectedIndustryIds.some(id => grantTagIds.includes(id))) {
+            matchScore += 25;
+            hasAnyMatch = true;
+        }
+        if (selectedPreferencesIds.some(id => grantTagIds.includes(id))) {
+            matchScore += 10;
+            hasAnyMatch = true;
+        }
+        
+        // Add recency bias - newer grants get a small boost (only if they have matches)
+        if (hasAnyMatch) {
+            const daysSinceCreated = Math.floor((Date.now() - new Date(grant.created_at).getTime()) / (1000 * 60 * 60 * 24));
+            if (daysSinceCreated <= 30) matchScore += 5; // Recent grants (last 30 days) get +5 points
+            else if (daysSinceCreated <= 90) matchScore += 2; // Semi-recent grants (last 90 days) get +2 points
+        }
         
         // Handle eligibility based on search type
         if (searchType === 'advanced') {
@@ -67,10 +81,13 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
             isEligible = true;
         }
 
-        return { ...grant, matchScore, isEligible };
+        return { ...grant, matchScore, isEligible, hasAnyMatch };
     });
 
-    const sortedGrants = scoredGrants.sort((a, b) => b.matchScore - a.matchScore);
+    // Filter out grants with no matches and sort by score
+    const sortedGrants = scoredGrants
+        .filter(grant => grant.hasAnyMatch) // Only show grants that have at least one match
+        .sort((a, b) => b.matchScore - a.matchScore);
 
     return (
         <div className="bg-black min-h-screen text-white p-4">
@@ -151,15 +168,30 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                             : 'border-red-500/30 hover:border-red-400/50'
                                 }`}>
                                     {/* Score Badge */}
-                                    <div className="absolute -top-2 -right-2">
-                                        <div className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg ${
-                                            grant.matchScore >= 50 
-                                                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
-                                                : grant.matchScore >= 25
-                                                    ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white'
-                                                    : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
-                                        }`}>
-                                            {grant.matchScore}
+                                    <div className="absolute -top-3 -right-3">
+                                        <div className="relative w-12 h-12">
+                                            {/* Background Circle */}
+                                            <div className="absolute inset-0 bg-gray-800 rounded-full border-2 border-gray-700"></div>
+                                            
+                                            {/* Score Circle */}
+                                            <div className={`absolute inset-0 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                grant.matchScore >= 50 
+                                                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30' 
+                                                    : grant.matchScore >= 25
+                                                        ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                                                        : 'bg-gradient-to-br from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/30'
+                                            }`}>
+                                                {grant.matchScore}
+                                            </div>
+                                            
+                                            {/* Glow Effect */}
+                                            <div className={`absolute inset-0 rounded-full opacity-20 blur-sm ${
+                                                grant.matchScore >= 50 
+                                                    ? 'bg-green-500' 
+                                                    : grant.matchScore >= 25
+                                                        ? 'bg-blue-500'
+                                                        : 'bg-gray-500'
+                                            }`}></div>
                                         </div>
                                     </div>
 

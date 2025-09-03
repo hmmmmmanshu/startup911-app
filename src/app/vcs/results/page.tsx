@@ -42,20 +42,36 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
   // --- 3. ALGORITHM: SCORING & SORTING ---
   const scoredVCs = vcs.map(vc => {
     let matchScore = 0;
+    let hasAnyMatch = false;
+    
     // @ts-expect-error - Safely handling complex Supabase join types
     const vcTagIds = vc.vc_tags.map(vt => vt.tags.id);
     
-    // Increment score for each match
-    allSelectedIds.forEach(selectedId => {
-      if (vcTagIds.includes(selectedId)) {
-        matchScore++;
-      }
-    });
+    // Check for stage matches (higher weight)
+    if (selectedStageIds.some(id => vcTagIds.includes(id))) {
+      matchScore += 30;
+      hasAnyMatch = true;
+    }
+    
+    // Check for industry matches (medium weight)
+    if (selectedIndustryIds.some(id => vcTagIds.includes(id))) {
+      matchScore += 25;
+      hasAnyMatch = true;
+    }
+    
+    // Check for region matches (lower weight)
+    if (selectedRegionIds.some(id => vcTagIds.includes(id))) {
+      matchScore += 15;
+      hasAnyMatch = true;
+    }
 
-    return { ...vc, matchScore };
+    return { ...vc, matchScore, hasAnyMatch };
   });
 
-  const sortedVCs = scoredVCs.sort((a, b) => b.matchScore - a.matchScore);
+  // Filter out VCs with no matches and sort by score
+  const sortedVCs = scoredVCs
+    .filter(vc => vc.hasAnyMatch) // Only show VCs that have at least one match
+    .sort((a, b) => b.matchScore - a.matchScore);
 
   // --- 4. RENDER UI ---
   return (
@@ -113,92 +129,150 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
               const regionTags = vcTags.filter((tag: VCTag) => tag.type === 'REGION');
               
               return (
-                <div key={vc.id} className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors">
-                  {/* Top Section */}
-                  <div className="mb-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h2 className="text-xl font-bold text-white">{vc.name}</h2>
-                      <div className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        Score: {vc.matchScore}
+                <div key={vc.id} className="group relative bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-green-500/30 hover:shadow-green-500/10">
+                  {/* Score Badge */}
+                  <div className="absolute -top-3 -right-3">
+                    <div className="relative w-12 h-12">
+                      {/* Background Circle */}
+                      <div className="absolute inset-0 bg-gray-800 rounded-full border-2 border-gray-700"></div>
+                      
+                      {/* Score Circle */}
+                      <div className={`absolute inset-0 rounded-full flex items-center justify-center text-xs font-bold ${
+                        vc.matchScore >= 50 
+                          ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30' 
+                          : vc.matchScore >= 25
+                            ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                            : 'bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30'
+                      }`}>
+                        {vc.matchScore}
                       </div>
+                      
+                      {/* Glow Effect */}
+                      <div className={`absolute inset-0 rounded-full opacity-20 blur-sm ${
+                        vc.matchScore >= 50 
+                          ? 'bg-green-500' 
+                          : vc.matchScore >= 25
+                            ? 'bg-blue-500'
+                            : 'bg-purple-500'
+                      }`}></div>
                     </div>
+                  </div>
+
+                  {/* Header Section */}
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-white mb-2 leading-tight group-hover:text-green-400 transition-colors">
+                      {vc.name}
+                    </h2>
                     
                     {vc.country_based_of && (
-                      <p className="text-green-400 text-sm font-medium mb-2">
-                        Based in {vc.country_based_of}
-                      </p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <p className="text-green-400 text-sm font-medium">
+                          Based in {vc.country_based_of}
+                        </p>
+                      </div>
                     )}
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-300 text-sm mb-4 leading-relaxed line-clamp-3">
-                    {vc.about}
-                  </p>
+                  <div className="mb-6">
+                    <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
+                      {vc.about}
+                    </p>
+                  </div>
 
-                  {/* Investment Stages */}
-                  {stageTags.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="text-white font-semibold text-sm mb-2">Investment Stages:</h3>
-                      <div className="flex flex-wrap gap-1">
-                        {stageTags.slice(0, 3).map((tag: VCTag) => (
-                          <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                            {tag.name}
-                          </span>
-                        ))}
-                        {stageTags.length > 3 && (
-                          <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                            +{stageTags.length - 3} more
-                          </span>
-                        )}
+                  {/* Tags Section */}
+                  <div className="space-y-4 mb-6">
+                    {/* Investment Stages */}
+                    {stageTags.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-5 h-5 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <span className="text-blue-400 text-xs">🚀</span>
+                          </div>
+                          <h3 className="text-white font-semibold text-sm">Investment Stages</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {stageTags.slice(0, 3).map((tag: VCTag) => (
+                            <span key={tag.id} className="bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-blue-500/30">
+                              {tag.name}
+                            </span>
+                          ))}
+                          {stageTags.length > 3 && (
+                            <span className="bg-gray-500/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-500/30">
+                              +{stageTags.length - 3} more
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Industries */}
-                  {industryTags.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="text-white font-semibold text-sm mb-2">Industries:</h3>
-                      <div className="flex flex-wrap gap-1">
-                        {industryTags.slice(0, 3).map((tag: VCTag) => (
-                          <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                            {tag.name}
-                          </span>
-                        ))}
-                        {industryTags.length > 3 && (
-                          <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                            +{industryTags.length - 3} more
-                          </span>
-                        )}
+                    {/* Industries */}
+                    {industryTags.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-5 h-5 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <span className="text-purple-400 text-xs">🏭</span>
+                          </div>
+                          <h3 className="text-white font-semibold text-sm">Industries</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {industryTags.slice(0, 3).map((tag: VCTag) => (
+                            <span key={tag.id} className="bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-purple-500/30">
+                              {tag.name}
+                            </span>
+                          ))}
+                          {industryTags.length > 3 && (
+                            <span className="bg-gray-500/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-500/30">
+                              +{industryTags.length - 3} more
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Regions */}
-                  {regionTags.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-white font-semibold text-sm mb-2">Regions:</h3>
-                      <div className="flex flex-wrap gap-1">
-                        {regionTags.map((tag: VCTag) => (
-                          <span key={tag.id} className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                            {tag.name}
-                          </span>
-                        ))}
+                    {/* Regions */}
+                    {regionTags.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-5 h-5 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                            <span className="text-emerald-400 text-xs">🌍</span>
+                          </div>
+                          <h3 className="text-white font-semibold text-sm">Regions</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {regionTags.map((tag: VCTag) => (
+                            <span key={tag.id} className="bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-500/30">
+                              {tag.name}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* Action Buttons */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <a 
                       href={vc.website || '#'} 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block w-full bg-green-500 text-white text-center py-2 px-4 rounded-lg font-semibold hover:bg-green-400 transition-colors"
+                      className="group/btn block w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center py-3 px-4 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-green-500/25 hover:scale-[1.02]"
                     >
-                      Visit Website
+                      <span className="flex items-center justify-center gap-2">
+                        Visit Website
+                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </span>
                     </a>
-                    <button className="block w-full bg-blue-500 text-white text-center py-2 px-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors">
-                      Contact VC
+                    <button className="group/btn block w-full bg-gray-700/50 text-gray-300 text-center py-3 px-4 rounded-xl font-semibold hover:bg-gray-600/50 hover:text-white transition-all duration-200 border border-gray-600/50 hover:border-gray-500/50">
+                      <span className="flex items-center justify-center gap-2">
+                        Contact VC
+                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </span>
                     </button>
                   </div>
                 </div>
