@@ -25,7 +25,6 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
       const selectedIndustryIds = parseIds(params.industry);
     const selectedStageIds = parseIds(params.stage);
     const selectedRegionIds = parseIds(params.region);
-  const allSelectedIds = [...selectedIndustryIds, ...selectedStageIds, ...selectedRegionIds];
 
   // --- 2. FETCH DATA ---
   const { data: vcsData, error } = await supabase
