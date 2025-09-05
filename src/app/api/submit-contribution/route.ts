@@ -4,9 +4,10 @@ import { createClient } from '@supabase/supabase-js';
 export async function POST(request: NextRequest) {
   try {
     // Create Supabase client inside the function to avoid build-time initialization
+    // Temporarily using anon key to test if service role key is the issue
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
     console.log('API Route: Environment variables check');
@@ -74,9 +75,12 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Database error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       return NextResponse.json({ 
         error: 'Failed to submit contribution', 
-        details: error.message 
+        details: error.message,
+        errorCode: error.code,
+        errorHint: error.hint
       }, { status: 500 });
     }
 
