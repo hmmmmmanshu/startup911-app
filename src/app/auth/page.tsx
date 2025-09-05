@@ -21,6 +21,8 @@ export default function AuthPage() {
   }>({ status: 'idle' });
 
   const router = useRouter();
+  
+  // Create Supabase client inside the component to avoid build-time initialization
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

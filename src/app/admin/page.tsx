@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 import { CheckCircle, XCircle, Clock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
 // Force dynamic rendering to avoid build-time Supabase client initialization
@@ -24,6 +24,12 @@ interface SubmissionState {
 }
 
 export default function AdminDashboard() {
+  // Create Supabase client inside the component to avoid build-time initialization
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [submissionState, setSubmissionState] = useState<SubmissionState>({ status: 'idle' });
@@ -60,7 +66,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [supabase]);
 
   const moderateSubmission = async (submissionId: string, action: 'approve' | 'reject') => {
     try {
