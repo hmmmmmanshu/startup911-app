@@ -359,6 +359,8 @@ function VCForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => voi
     key_person: '',
     sector: '',
     area_info: '',
+    stage_focus: '',
+    region_focus: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -369,6 +371,29 @@ function VCForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => voi
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  // Predefined options for dropdowns
+  const stageOptions = [
+    'Pre-Seed',
+    'Seed',
+    'Series A',
+    'Series B',
+    'Series C+',
+    'Growth Stage',
+    'Late Stage',
+    'All Stages'
+  ];
+
+  const regionOptions = [
+    'India',
+    'North America',
+    'Europe',
+    'Southeast Asia',
+    'Middle East',
+    'Africa',
+    'Global',
+    'Asia Pacific'
+  ];
 
   return (
     <div>
@@ -450,6 +475,40 @@ function VCForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => voi
               <option value="Agriculture & Food">Agriculture & Food</option>
               <option value="Manufacturing">Manufacturing</option>
               <option value="Sector Agnostic">Sector Agnostic</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Stage Focus
+            </label>
+            <select
+              value={formData.stage_focus}
+              onChange={(e) => handleInputChange('stage_focus', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+            >
+              <option value="">Select investment stage</option>
+              {stageOptions.map(stage => (
+                <option key={stage} value={stage}>{stage}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Geographic Focus
+            </label>
+            <select
+              value={formData.region_focus}
+              onChange={(e) => handleInputChange('region_focus', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+            >
+              <option value="">Select geographic focus</option>
+              {regionOptions.map(region => (
+                <option key={region} value={region}>{region}</option>
+              ))}
             </select>
           </div>
         </div>
