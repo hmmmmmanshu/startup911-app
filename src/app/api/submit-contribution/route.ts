@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate submission data based on type
-    let validationErrors: string[] = [];
+    const validationErrors: string[] = [];
 
     if (submission_type === 'grant') {
       if (!submission_data.name) validationErrors.push('Grant name is required');

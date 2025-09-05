@@ -57,7 +57,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   const moderateSubmission = async (submissionId: string, action: 'approve' | 'reject') => {
     try {
