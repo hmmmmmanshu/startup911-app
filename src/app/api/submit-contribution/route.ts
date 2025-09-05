@@ -9,8 +9,16 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    console.log('API Route: Environment variables check');
+    console.log('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing');
+    console.log('SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing');
+
     const body = await request.json();
     const { submission_type, submission_data } = body;
+
+    console.log('API Route: Received request');
+    console.log('Submission type:', submission_type);
+    console.log('Submission data:', JSON.stringify(submission_data, null, 2));
 
     // Validate required fields
     if (!submission_type || !submission_data) {

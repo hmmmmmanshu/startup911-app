@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/client';
 import { CheckCircle, XCircle, Clock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
 interface Submission {
@@ -27,11 +27,6 @@ export default function AdminDashboard() {
   const [expandedSubmission, setExpandedSubmission] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Create Supabase client inside the component
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
   const fetchSubmissions = useCallback(async () => {
     try {
@@ -62,7 +57,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   const moderateSubmission = async (submissionId: string, action: 'approve' | 'reject') => {
     try {
