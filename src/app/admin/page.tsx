@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { CheckCircle, XCircle, Clock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
+// Force dynamic rendering to avoid build-time Supabase client initialization
+export const dynamic = 'force-dynamic';
+
 interface Submission {
   id: string;
   submission_type: 'grant' | 'vc' | 'mentor' | 'incubation_centre' | 'post';

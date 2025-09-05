@@ -65,16 +65,16 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
         // Handle eligibility based on search type
         if (searchType === 'advanced') {
             // Advanced search: Apply strict eligibility requirements
-            const userHasRequirement = (name: string) => selectedDocumentsRequiredIds.some(id => requirementMap.get(id) === name);
-            if (grant.dpiit_required && !userHasRequirement('DPIIT Registration')) isEligible = false;
-            if (grant.patent_required && !userHasRequirement('Patent/IP')) isEligible = false;
-            if (grant.prototype_required && !userHasRequirement('Working Prototype')) isEligible = false;
-            if (grant.technical_cofounder_required && !userHasRequirement('Technical Co-founder')) isEligible = false;
-            if (grant.full_time_commitment && !userHasRequirement('Full-time Commitment')) isEligible = false;
+        const userHasRequirement = (name: string) => selectedDocumentsRequiredIds.some(id => requirementMap.get(id) === name);
+        if (grant.dpiit_required && !userHasRequirement('DPIIT Registration')) isEligible = false;
+        if (grant.patent_required && !userHasRequirement('Patent/IP')) isEligible = false;
+        if (grant.prototype_required && !userHasRequirement('Working Prototype')) isEligible = false;
+        if (grant.technical_cofounder_required && !userHasRequirement('Technical Co-founder')) isEligible = false;
+        if (grant.full_time_commitment && !userHasRequirement('Full-time Commitment')) isEligible = false;
 
-            // If not eligible, apply a heavy penalty to push it down the list
-            if (!isEligible) {
-                matchScore -= 100;
+        // If not eligible, apply a heavy penalty to push it down the list
+        if (!isEligible) {
+            matchScore -= 100;
             }
         } else {
             // Simple search: Ignore hard eligibility filters, just show all grants
@@ -204,7 +204,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                         <div className="flex items-center gap-2 mb-3">
                                             <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                                             <p className="text-green-400 text-sm font-medium">
-                                                {grant.organization}
+                                            {grant.organization}
                                             </p>
                                         </div>
 
@@ -221,8 +221,8 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                     {/* Description */}
                                     <div className="mb-6">
                                         <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
-                                            {grant.details}
-                                        </p>
+                                        {grant.details}
+                                    </p>
                                     </div>
 
                                     {/* Grant Amount */}
@@ -236,7 +236,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                                     <h3 className="text-white font-semibold text-sm">Grant Amount</h3>
                                                 </div>
                                                 <p className="text-green-300 text-sm font-medium">
-                                                    {grant.amount_max}
+                                                {grant.amount_max}
                                                 </p>
                                             </div>
                                         </div>
@@ -244,8 +244,8 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
 
                                     {/* Tags Section */}
                                     <div className="space-y-4 mb-6">
-                                        {/* Stages */}
-                                        {stageTags.length > 0 && (
+                                    {/* Stages */}
+                                    {stageTags.length > 0 && (
                                             <div>
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <div className="w-5 h-5 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -254,22 +254,22 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                                     <h3 className="text-white font-semibold text-sm">Stages</h3>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {stageTags.slice(0, 3).map((tag: GrantTag) => (
+                                                {stageTags.slice(0, 3).map((tag: GrantTag) => (
                                                         <span key={tag.id} className="bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-blue-500/30">
-                                                            {tag.name}
-                                                        </span>
-                                                    ))}
-                                                    {stageTags.length > 3 && (
+                                                        {tag.name}
+                                                    </span>
+                                                ))}
+                                                {stageTags.length > 3 && (
                                                         <span className="bg-gray-500/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-500/30">
-                                                            +{stageTags.length - 3} more
-                                                        </span>
-                                                    )}
-                                                </div>
+                                                        +{stageTags.length - 3} more
+                                                    </span>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
 
-                                        {/* Industries */}
-                                        {industryTags.length > 0 && (
+                                    {/* Industries */}
+                                    {industryTags.length > 0 && (
                                             <div>
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <div className="w-5 h-5 bg-purple-500/20 rounded-lg flex items-center justify-center">
@@ -278,22 +278,22 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                                     <h3 className="text-white font-semibold text-sm">Industries</h3>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {industryTags.slice(0, 3).map((tag: GrantTag) => (
+                                                {industryTags.slice(0, 3).map((tag: GrantTag) => (
                                                         <span key={tag.id} className="bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-purple-500/30">
-                                                            {tag.name}
-                                                        </span>
-                                                    ))}
-                                                    {industryTags.length > 3 && (
+                                                        {tag.name}
+                                                    </span>
+                                                ))}
+                                                {industryTags.length > 3 && (
                                                         <span className="bg-gray-500/20 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-500/30">
-                                                            +{industryTags.length - 3} more
-                                                        </span>
-                                                    )}
-                                                </div>
+                                                        +{industryTags.length - 3} more
+                                                    </span>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
 
-                                        {/* Impact Areas */}
-                                        {socialImpactTags.length > 0 && (
+                                    {/* Impact Areas */}
+                                    {socialImpactTags.length > 0 && (
                                             <div>
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <div className="w-5 h-5 bg-emerald-500/20 rounded-lg flex items-center justify-center">
@@ -302,14 +302,14 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                                     <h3 className="text-white font-semibold text-sm">Impact Areas</h3>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {socialImpactTags.map((tag: GrantTag) => (
+                                                {socialImpactTags.map((tag: GrantTag) => (
                                                         <span key={tag.id} className="bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-500/30">
-                                                            {tag.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
+                                                        {tag.name}
+                                                    </span>
+                                                ))}
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
                                     </div>
 
                                     {/* Action Buttons */}
@@ -321,7 +321,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                             className="group/btn block w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center py-3 px-4 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-green-500/25 hover:scale-[1.02]"
                                         >
                                             <span className="flex items-center justify-center gap-2">
-                                                Apply Now
+                                            Apply Now
                                                 <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                 </svg>
@@ -329,7 +329,7 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
                                         </a>
                                         <button className="group/btn block w-full bg-gray-700/50 text-gray-300 text-center py-3 px-4 rounded-xl font-semibold hover:bg-gray-600/50 hover:text-white transition-all duration-200 border border-gray-600/50 hover:border-gray-500/50">
                                             <span className="flex items-center justify-center gap-2">
-                                                Learn More
+                                            Learn More
                                                 <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
