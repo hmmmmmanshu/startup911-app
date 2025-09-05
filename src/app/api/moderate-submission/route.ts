@@ -114,6 +114,64 @@ export async function POST(request: NextRequest) {
             .select()
             .single();
 
+          // Handle tag mapping for Grant
+          if (insertResult.data && !insertResult.error) {
+            const grantId = insertResult.data.id;
+            const tagMappings = [];
+
+            // Map requirements to requirement tags
+            const requirementMappings = [
+              { field: 'dpiit_required', tagName: 'DPIIT Registration' },
+              { field: 'patent_required', tagName: 'Patent/IP' },
+              { field: 'prototype_required', tagName: 'Working Prototype' },
+              { field: 'technical_cofounder_required', tagName: 'Technical Co-founder' },
+              { field: 'full_time_commitment', tagName: 'Full-time Commitment' }
+            ];
+
+            for (const mapping of requirementMappings) {
+              if (submissionData[mapping.field]) {
+                const { data: requirementTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', mapping.tagName)
+                  .eq('type', 'REQUIREMENT')
+                  .single();
+                
+                if (requirementTag) {
+                  tagMappings.push({ grant_id: grantId, tag_id: requirementTag.id });
+                }
+              }
+            }
+
+            // Map special categories
+            const specialCategoryMappings = [
+              { field: 'women_led_focus', tagName: 'Women-Led Startup' },
+              { field: 'student_focus', tagName: 'Student Startup' }
+            ];
+
+            for (const mapping of specialCategoryMappings) {
+              if (submissionData[mapping.field]) {
+                const { data: specialTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', mapping.tagName)
+                  .eq('type', 'SPECIAL_CATEGORY')
+                  .single();
+                
+                if (specialTag) {
+                  tagMappings.push({ grant_id: grantId, tag_id: specialTag.id });
+                }
+              }
+            }
+
+            // Insert tag mappings
+            if (tagMappings.length > 0) {
+              await supabase
+                .from('grant_tags')
+                .insert(tagMappings);
+            }
+          }
+
         } else if (submissionType === 'vc') {
           // Insert into vcs table
           const vcData = {
@@ -130,6 +188,61 @@ export async function POST(request: NextRequest) {
             .insert([vcData])
             .select()
             .single();
+
+          // Handle tag mapping for VC
+          if (insertResult.data && !insertResult.error) {
+            const vcId = insertResult.data.id;
+            const tagMappings = [];
+
+            // Map sector to industry tag
+            if (submissionData.sector) {
+              const { data: industryTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', submissionData.sector)
+                .eq('type', 'INDUSTRY')
+                .single();
+              
+              if (industryTag) {
+                tagMappings.push({ vc_id: vcId, tag_id: industryTag.id });
+              }
+            }
+
+            // Map stage_focus to stage tag
+            if (submissionData.stage_focus) {
+              const { data: stageTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', submissionData.stage_focus)
+                .eq('type', 'STAGE')
+                .single();
+              
+              if (stageTag) {
+                tagMappings.push({ vc_id: vcId, tag_id: stageTag.id });
+              }
+            }
+
+            // Map region_focus to region tag
+            if (submissionData.region_focus) {
+              const { data: regionTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', submissionData.region_focus)
+                .eq('type', 'REGION')
+                .single();
+              
+              if (regionTag) {
+                tagMappings.push({ vc_id: vcId, tag_id: regionTag.id });
+              }
+            }
+
+            // Insert tag mappings
+            if (tagMappings.length > 0) {
+              await supabase
+                .from('vc_tags')
+                .insert(tagMappings);
+            }
+          }
 
         } else if (submissionType === 'mentor') {
           // Insert into mentors table
@@ -149,6 +262,40 @@ export async function POST(request: NextRequest) {
             .insert([mentorData])
             .select()
             .single();
+
+          // Handle tag mapping for Mentor
+          if (insertResult.data && !insertResult.error) {
+            const mentorId = insertResult.data.id;
+            const tagMappings = [];
+
+            // Map superpower to industry tag (if it matches known industries)
+            if (submissionData.superpower) {
+              const superpower = submissionData.superpower as string;
+              
+              // Try to match superpower to industry tags
+              const { data: industryTags } = await supabase
+                .from('tags')
+                .select('id, name')
+                .eq('type', 'INDUSTRY');
+              
+              if (industryTags) {
+                for (const tag of industryTags) {
+                  if (superpower.toLowerCase().includes(tag.name.toLowerCase()) || 
+                      tag.name.toLowerCase().includes(superpower.toLowerCase())) {
+                    tagMappings.push({ mentor_id: mentorId, tag_id: tag.id });
+                    break; // Only match the first industry found
+                  }
+                }
+              }
+            }
+
+            // Insert tag mappings
+            if (tagMappings.length > 0) {
+              await supabase
+                .from('mentor_tags')
+                .insert(tagMappings);
+            }
+          }
 
         } else {
           return NextResponse.json({ error: `Unsupported submission type: ${submissionType}` }, { status: 400 });
