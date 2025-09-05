@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
@@ -22,11 +22,11 @@ export default function AuthPage() {
 
   const router = useRouter();
   
-  // Create Supabase client inside the component to avoid build-time initialization
-  const supabase = createClient(
+  // Create Supabase client using useMemo to prevent recreation on every render
+  const supabase = useMemo(() => createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  ), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { CheckCircle, XCircle, Clock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
@@ -24,11 +24,11 @@ interface SubmissionState {
 }
 
 export default function AdminDashboard() {
-  // Create Supabase client inside the component to avoid build-time initialization
-  const supabase = createClient(
+  // Create Supabase client using useMemo to prevent recreation on every render
+  const supabase = useMemo(() => createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  ), []);
 
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +39,7 @@ export default function AdminDashboard() {
 
   const fetchSubmissions = useCallback(async () => {
     try {
+      console.log('AdminDashboard: fetchSubmissions called');
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -172,6 +173,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    console.log('AdminDashboard: useEffect triggered, fetching submissions');
     fetchSubmissions();
   }, [fetchSubmissions]);
 
