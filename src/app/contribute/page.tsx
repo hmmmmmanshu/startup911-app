@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Briefcase, Brain, Handshake, CheckCircle, AlertCircle } from 'lucide-react';
-import Image from 'next/image';
 
 // Submission type definition
 type SubmissionType = 'grant' | 'vc' | 'mentor';
@@ -688,6 +687,7 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
             {(photoPreview || formData.photo_url) && (
               <div className="mb-4">
                 <div className="relative w-24 h-24 mx-auto">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photoPreview || formData.photo_url}
                     alt="Profile preview"

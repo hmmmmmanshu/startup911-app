@@ -190,15 +190,18 @@ export default async function MentorsResultsPage({
                 {/* Profile Photo */}
                 <div className="text-center mb-4">
                   {mentor.photo_url ? (
-                    <img
-                      src={mentor.photo_url}
-                      alt={`Photo of ${mentor.name}`}
-                      className="w-24 h-24 rounded-full object-cover mx-auto mb-3"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/logo.svg';
-                      }}
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={mentor.photo_url}
+                        alt={`Photo of ${mentor.name}`}
+                        className="w-24 h-24 rounded-full object-cover mx-auto mb-3"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/logo.svg';
+                        }}
+                      />
+                    </>
                   ) : (
                     <Image
                       src="/logo.svg"
