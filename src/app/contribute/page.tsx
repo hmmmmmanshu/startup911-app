@@ -570,7 +570,8 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
   const [formData, setFormData] = useState({
     name: '',
     photo_url: '',
-    superpower: '',
+    sector: '',
+    functional_expertise: '',
     about: '',
     rate_tier: '',
     languages: [] as string[],
@@ -687,12 +688,14 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
             {(photoPreview || formData.photo_url) && (
               <div className="mb-4">
                 <div className="relative w-24 h-24 mx-auto">
-                  <Image
+                  <img
                     src={photoPreview || formData.photo_url}
                     alt="Profile preview"
-                    width={96}
-                    height={96}
                     className="w-24 h-24 rounded-full object-cover border-2 border-green-500/30"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
                   />
                   {uploadingPhoto && (
                     <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
@@ -731,33 +734,49 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Superpower/Expertise *
-          </label>
-          <select
-            value={formData.superpower}
-            onChange={(e) => handleInputChange('superpower', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-            required
-          >
-            <option value="">Select your area of expertise</option>
-            <option value="Technology & Software">Technology & Software</option>
-            <option value="Finance & Fintech">Finance & Fintech</option>
-            <option value="Healthcare & Biotech">Healthcare & Biotech</option>
-            <option value="E-commerce & Retail">E-commerce & Retail</option>
-            <option value="Education & EdTech">Education & EdTech</option>
-            <option value="Energy & Sustainability">Energy & Sustainability</option>
-            <option value="Agriculture & Food">Agriculture & Food</option>
-            <option value="Manufacturing">Manufacturing</option>
-            <option value="Product Strategy">Product Strategy</option>
-            <option value="Marketing & Growth">Marketing & Growth</option>
-            <option value="Operations & Scaling">Operations & Scaling</option>
-            <option value="Fundraising & Investment">Fundraising & Investment</option>
-            <option value="Legal & Compliance">Legal & Compliance</option>
-            <option value="Sales & Business Development">Sales & Business Development</option>
-            <option value="Human Resources & Talent">Human Resources & Talent</option>
-          </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Industry Sector *
+            </label>
+            <select
+              value={formData.sector}
+              onChange={(e) => handleInputChange('sector', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+              required
+            >
+              <option value="">Select your industry sector</option>
+              <option value="Technology & Software">Technology & Software</option>
+              <option value="Finance & Fintech">Finance & Fintech</option>
+              <option value="Healthcare & Biotech">Healthcare & Biotech</option>
+              <option value="E-commerce & Retail">E-commerce & Retail</option>
+              <option value="Education & EdTech">Education & EdTech</option>
+              <option value="Energy & Sustainability">Energy & Sustainability</option>
+              <option value="Agriculture & Food">Agriculture & Food</option>
+              <option value="Manufacturing">Manufacturing</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Functional Expertise *
+            </label>
+            <select
+              value={formData.functional_expertise}
+              onChange={(e) => handleInputChange('functional_expertise', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+              required
+            >
+              <option value="">Select your functional expertise</option>
+              <option value="Product Strategy">Product Strategy</option>
+              <option value="Marketing & Growth">Marketing & Growth</option>
+              <option value="Operations & Scaling">Operations & Scaling</option>
+              <option value="Fundraising & Investment">Fundraising & Investment</option>
+              <option value="Legal & Compliance">Legal & Compliance</option>
+              <option value="Sales & Business Development">Sales & Business Development</option>
+              <option value="Human Resources & Talent">Human Resources & Talent</option>
+            </select>
+          </div>
         </div>
 
         <div>

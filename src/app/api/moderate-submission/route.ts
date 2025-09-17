@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
           const mentorData = {
             name: submissionData.name,
             photo_url: submissionData.photo_url,
-            superpower: submissionData.superpower,
+            superpower: `${submissionData.sector || ''}${submissionData.sector && submissionData.functional_expertise ? ' | ' : ''}${submissionData.functional_expertise || ''}`.trim(),
             about: submissionData.about,
             rate_tier: submissionData.rate_tier,
             languages: submissionData.languages || [],
@@ -268,75 +268,58 @@ export async function POST(request: NextRequest) {
             const mentorId = insertResult.data.id;
             const tagMappings = [];
 
-            // Map superpower to tags (industry or expertise)
-            if (submissionData.superpower) {
-              const superpower = submissionData.superpower as string;
+            // Map sector and functional expertise to tags
+            const sector = submissionData.sector as string;
+            const functionalExpertise = submissionData.functional_expertise as string;
+            
+            // Direct mapping for exact matches with industry tags
+            const industryMappings: Record<string, string> = {
+              'Technology & Software': 'Technology & Software',
+              'Finance & Fintech': 'Finance & Fintech',
+              'Healthcare & Biotech': 'Healthcare & Biotech',
+              'E-commerce & Retail': 'E-commerce & Retail',
+              'Education & EdTech': 'Education & EdTech',
+              'Energy & Sustainability': 'Energy & Sustainability',
+              'Agriculture & Food': 'Agriculture & Food',
+              'Manufacturing': 'Manufacturing'
+            };
+
+            // Direct mapping for functional expertise
+            const expertiseMappings: Record<string, string> = {
+              'Product Strategy': 'Product Strategy',
+              'Marketing & Growth': 'Marketing & Growth',
+              'Operations & Scaling': 'Operations & Scaling',
+              'Fundraising & Investment': 'Fundraising & Investment',
+              'Legal & Compliance': 'Legal & Compliance',
+              'Sales & Business Development': 'Sales & Business Development',
+              'Human Resources & Talent': 'Human Resources & Talent'
+            };
+
+            // Map industry sector
+            if (sector && industryMappings[sector]) {
+              const { data: industryTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', industryMappings[sector])
+                .eq('type', 'INDUSTRY')
+                .single();
               
-              // Direct mapping for exact matches with industry tags
-              const industryMappings: Record<string, string> = {
-                'Technology & Software': 'Technology & Software',
-                'Finance & Fintech': 'Finance & Fintech',
-                'Healthcare & Biotech': 'Healthcare & Biotech',
-                'E-commerce & Retail': 'E-commerce & Retail',
-                'Education & EdTech': 'Education & EdTech',
-                'Energy & Sustainability': 'Energy & Sustainability',
-                'Agriculture & Food': 'Agriculture & Food',
-                'Manufacturing': 'Manufacturing'
-              };
+              if (industryTag) {
+                tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
+              }
+            }
 
-              // Direct mapping for functional expertise
-              const expertiseMappings: Record<string, string> = {
-                'Product Strategy': 'Product Strategy',
-                'Marketing & Growth': 'Marketing & Growth',
-                'Operations & Scaling': 'Operations & Scaling',
-                'Fundraising & Investment': 'Fundraising & Investment',
-                'Legal & Compliance': 'Legal & Compliance',
-                'Sales & Business Development': 'Sales & Business Development',
-                'Human Resources & Talent': 'Human Resources & Talent'
-              };
-
-              // First try industry mapping
-              if (industryMappings[superpower]) {
-                const { data: industryTag } = await supabase
-                  .from('tags')
-                  .select('id')
-                  .eq('name', industryMappings[superpower])
-                  .eq('type', 'INDUSTRY')
-                  .single();
-                
-                if (industryTag) {
-                  tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
-                }
-              } 
-              // Then try expertise mapping
-              else if (expertiseMappings[superpower]) {
-                const { data: expertiseTag } = await supabase
-                  .from('tags')
-                  .select('id')
-                  .eq('name', expertiseMappings[superpower])
-                  .eq('type', 'EXPERTISE')
-                  .single();
-                
-                if (expertiseTag) {
-                  tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
-                }
-              } 
-              // Fallback: Try to match superpower to any tags using substring matching
-              else {
-                const { data: allTags } = await supabase
-                  .from('tags')
-                  .select('id, name')
-                  .in('type', ['INDUSTRY', 'EXPERTISE']);
-                
-                if (allTags) {
-                  for (const tag of allTags) {
-                    if (superpower.toLowerCase().includes(tag.name.toLowerCase()) || 
-                        tag.name.toLowerCase().includes(superpower.toLowerCase())) {
-                      tagMappings.push({ mentor_id: mentorId, tag_id: tag.id });
-                      break; // Only match the first tag found
-                    }
-                  }
-                }
+            // Map functional expertise
+            if (functionalExpertise && expertiseMappings[functionalExpertise]) {
+              const { data: expertiseTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', expertiseMappings[functionalExpertise])
+                .eq('type', 'EXPERTISE')
+                .single();
+              
+              if (expertiseTag) {
+                tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
               }
             }
 

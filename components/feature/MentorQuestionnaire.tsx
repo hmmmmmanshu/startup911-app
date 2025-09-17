@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation';
 type Tag = { id: number; name: string; type: string };
 
 // Define the questions and the order they will appear in
-const QUESTION_ORDER = ['EXPERTISE', 'LANGUAGE', 'BUDGET'];
+const QUESTION_ORDER = ['INDUSTRY', 'EXPERTISE', 'LANGUAGE', 'BUDGET'];
 const QUESTION_TITLES: Record<string, string> = {
-  EXPERTISE: "What type of expertise are you looking for?",
+  INDUSTRY: "Which industry sector do you need help with?",
+  EXPERTISE: "What functional expertise are you looking for?",
   LANGUAGE: "Which languages should your mentor speak?",
   BUDGET: "What's your budget for mentorship?"
 };
@@ -36,10 +37,21 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [selections, setSelections] = useState<Record<string, (string | number)[]>>({
+    INDUSTRY: [],
     EXPERTISE: [],
     LANGUAGE: [],
     BUDGET: []
   });
+
+  const handleIndustrySelection = (tagId: number) => {
+    setSelections(prev => {
+      const currentSelections = prev.INDUSTRY || [];
+      const newSelections = currentSelections.includes(tagId)
+        ? currentSelections.filter(id => id !== tagId) // Deselect
+        : [...currentSelections, tagId]; // Select
+      return { ...prev, INDUSTRY: newSelections };
+    });
+  };
 
   const handleExpertiseSelection = (tagId: number) => {
     setSelections(prev => {
@@ -76,6 +88,11 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
       // Last step: Construct the query string and navigate
       const queryParts = [];
       
+      // Add industry selections (tag IDs)
+      if (selections.INDUSTRY.length > 0) {
+        queryParts.push(`industry=${selections.INDUSTRY.join(',')}`);
+      }
+      
       // Add expertise selections (tag IDs) 
       if (selections.EXPERTISE.length > 0) {
         queryParts.push(`expertise=${selections.EXPERTISE.join(',')}`);
@@ -106,11 +123,10 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
   // Get options for current step
   const getCurrentOptions = () => {
     switch (currentCategory) {
+      case 'INDUSTRY':
+        return groupedTags.INDUSTRY || [];
       case 'EXPERTISE':
-        // Combine both INDUSTRY and EXPERTISE tags for comprehensive selection
-        const industryTags = groupedTags.INDUSTRY || [];
-        const expertiseTags = groupedTags.EXPERTISE || [];
-        return [...industryTags, ...expertiseTags];
+        return groupedTags.EXPERTISE || [];
       case 'LANGUAGE':
         return LANGUAGE_OPTIONS.map(lang => ({ id: lang, name: lang }));
       case 'BUDGET':
@@ -131,6 +147,9 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
   // Handle selection based on current step
   const handleSelection = (optionId: string | number) => {
     switch (currentCategory) {
+      case 'INDUSTRY':
+        handleIndustrySelection(optionId as number);
+        break;
       case 'EXPERTISE':
         handleExpertiseSelection(optionId as number);
         break;
@@ -168,7 +187,7 @@ export default function MentorQuestionnaire({ groupedTags }: MentorQuestionnaire
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           {options.map(option => {
-            const optionId = currentCategory === 'EXPERTISE' ? (option as Tag).id : option.id;
+            const optionId = (currentCategory === 'INDUSTRY' || currentCategory === 'EXPERTISE') ? (option as Tag).id : option.id;
             const selected = isSelected(optionId);
             
             return (

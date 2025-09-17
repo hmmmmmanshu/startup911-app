@@ -23,6 +23,7 @@ export default async function MentorsResultsPage({
   const params = await searchParams;
   
   // --- 1. PARSE USER INPUT FROM URL ---
+  const selectedIndustryIds = params.industry?.toString().split(',').map(Number) || [];
   const selectedExpertiseIds = params.expertise?.toString().split(',').map(Number) || [];
   const selectedLanguages = params.language?.toString().split(',') || [];
   const selectedBudget = params.budget?.toString() || '';
@@ -90,14 +91,26 @@ export default async function MentorsResultsPage({
   const scoredMentors = mentors.map(mentor => {
     let matchScore = 0;
     
-    // Score based on expertise match (both industry and functional expertise)
+    // Score based on tag matches (industry and functional expertise)
     const mentorTagIds = mentor.mentor_tags?.map(mt => mt.tags.id) || [];
+    
+    // Industry match scoring
+    if (selectedIndustryIds.length > 0) {
+      if (mentorTagIds.some(id => selectedIndustryIds.includes(id))) {
+        matchScore += 30; // Points for industry match
+      }
+    }
+    
+    // Expertise match scoring
     if (selectedExpertiseIds.length > 0) {
       if (mentorTagIds.some(id => selectedExpertiseIds.includes(id))) {
-        matchScore += 50; // Major points for expertise match
+        matchScore += 30; // Points for expertise match
       }
-    } else {
-      matchScore += 10; // Small boost for being in the pool if no expertise is selected
+    }
+    
+    // Base score if no specific criteria
+    if (selectedIndustryIds.length === 0 && selectedExpertiseIds.length === 0) {
+      matchScore += 10; // Small boost for being in the pool
     }
 
     return { ...mentor, matchScore };
@@ -144,9 +157,15 @@ export default async function MentorsResultsPage({
                 <span className="text-gray-300">{selectedBudget} per hour</span>
               </div>
             )}
+            {selectedIndustryIds.length > 0 && (
+              <div>
+                <span className="text-green-500 font-medium">Industry: </span>
+                <span className="text-gray-300">Selected</span>
+              </div>
+            )}
             {selectedExpertiseIds.length > 0 && (
               <div>
-                <span className="text-green-500 font-medium">Expertise Match: </span>
+                <span className="text-green-500 font-medium">Expertise: </span>
                 <span className="text-gray-300">Selected</span>
               </div>
             )}
@@ -170,13 +189,25 @@ export default async function MentorsResultsPage({
               <div key={mentor.id} className="bg-gray-900 rounded-lg p-6 hover:bg-gray-800 transition-colors">
                 {/* Profile Photo */}
                 <div className="text-center mb-4">
-                  <Image
-                    src={mentor.photo_url || '/logo.svg'}
-                    alt={`Photo of ${mentor.name}`}
-                    width={96}
-                    height={96}
-                    className="w-24 h-24 rounded-full object-cover mx-auto mb-3"
-                  />
+                  {mentor.photo_url ? (
+                    <img
+                      src={mentor.photo_url}
+                      alt={`Photo of ${mentor.name}`}
+                      className="w-24 h-24 rounded-full object-cover mx-auto mb-3"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/logo.svg';
+                      }}
+                    />
+                  ) : (
+                    <Image
+                      src="/logo.svg"
+                      alt={`Photo of ${mentor.name}`}
+                      width={96}
+                      height={96}
+                      className="w-24 h-24 rounded-full object-cover mx-auto mb-3"
+                    />
+                  )}
                   <h3 className="text-xl font-semibold text-white">{mentor.name}</h3>
                   {mentor.superpower && (
                     <p className="text-green-400 text-sm font-medium mt-1">{mentor.superpower}</p>
