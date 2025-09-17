@@ -6,8 +6,8 @@ import type { Tag } from '../../../lib/types';
 export default async function MentorsPage() {
   const supabase = await createClient();
   
-  // Fetch only industry tags as required by this questionnaire
-  const { data: tagsData } = await supabase.from('tags').select('*');
+  // Fetch both industry and expertise tags for comprehensive mentor search
+  const { data: tagsData } = await supabase.from('tags').select('*').in('type', ['INDUSTRY', 'EXPERTISE']);
   
   const groupTagsByType = (tags: Array<{ id: number; name: string; type: string | null }>) => { 
     return tags.reduce((acc: Record<string, Tag[]>, tag) => { 

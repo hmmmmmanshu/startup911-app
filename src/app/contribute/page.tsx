@@ -733,15 +733,31 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Superpower/Expertise
+            Superpower/Expertise *
           </label>
-          <input
-            type="text"
+          <select
             value={formData.superpower}
             onChange={(e) => handleInputChange('superpower', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
-            placeholder="e.g., Fintech Innovation, Product Strategy"
-          />
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+            required
+          >
+            <option value="">Select your area of expertise</option>
+            <option value="Technology & Software">Technology & Software</option>
+            <option value="Finance & Fintech">Finance & Fintech</option>
+            <option value="Healthcare & Biotech">Healthcare & Biotech</option>
+            <option value="E-commerce & Retail">E-commerce & Retail</option>
+            <option value="Education & EdTech">Education & EdTech</option>
+            <option value="Energy & Sustainability">Energy & Sustainability</option>
+            <option value="Agriculture & Food">Agriculture & Food</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Product Strategy">Product Strategy</option>
+            <option value="Marketing & Growth">Marketing & Growth</option>
+            <option value="Operations & Scaling">Operations & Scaling</option>
+            <option value="Fundraising & Investment">Fundraising & Investment</option>
+            <option value="Legal & Compliance">Legal & Compliance</option>
+            <option value="Sales & Business Development">Sales & Business Development</option>
+            <option value="Human Resources & Talent">Human Resources & Talent</option>
+          </select>
         </div>
 
         <div>

@@ -23,7 +23,7 @@ export default async function MentorsResultsPage({
   const params = await searchParams;
   
   // --- 1. PARSE USER INPUT FROM URL ---
-  const selectedIndustryIds = params.industry?.toString().split(',').map(Number) || [];
+  const selectedExpertiseIds = params.expertise?.toString().split(',').map(Number) || [];
   const selectedLanguages = params.language?.toString().split(',') || [];
   const selectedBudget = params.budget?.toString() || '';
 
@@ -90,14 +90,14 @@ export default async function MentorsResultsPage({
   const scoredMentors = mentors.map(mentor => {
     let matchScore = 0;
     
-    // Score based on industry match
+    // Score based on expertise match (both industry and functional expertise)
     const mentorTagIds = mentor.mentor_tags?.map(mt => mt.tags.id) || [];
-    if (selectedIndustryIds.length > 0) {
-      if (mentorTagIds.some(id => selectedIndustryIds.includes(id))) {
-        matchScore += 50; // Major points for industry match
+    if (selectedExpertiseIds.length > 0) {
+      if (mentorTagIds.some(id => selectedExpertiseIds.includes(id))) {
+        matchScore += 50; // Major points for expertise match
       }
     } else {
-      matchScore += 10; // Small boost for being in the pool if no industry is selected
+      matchScore += 10; // Small boost for being in the pool if no expertise is selected
     }
 
     return { ...mentor, matchScore };
