@@ -144,9 +144,9 @@ export default async function MentorsResultsPage({
                 <span className="text-gray-300">{selectedBudget} per hour</span>
               </div>
             )}
-            {selectedIndustryIds.length > 0 && (
+            {selectedExpertiseIds.length > 0 && (
               <div>
-                <span className="text-green-500 font-medium">Industry Match: </span>
+                <span className="text-green-500 font-medium">Expertise Match: </span>
                 <span className="text-gray-300">Selected</span>
               </div>
             )}
