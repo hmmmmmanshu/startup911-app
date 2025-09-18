@@ -85,4 +85,5 @@ export type Mentor = {
   rate_tier: string;
   linkedin_url: string;
   calendly_url: string;
+  created_at: string;
 }; 
