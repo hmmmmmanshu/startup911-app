@@ -103,7 +103,7 @@ export default function HomePage() {
             
             <div className="bg-[#1C1C1E] p-8 rounded-xl border border-gray-800">
               <h3 className="text-2xl font-bold text-white mb-4">Mumbai Angel Network</h3>
-              <p className="text-gray-400 mb-6">Connect with angel investors and early-stage VCs in Mumbai's thriving startup ecosystem.</p>
+              <p className="text-gray-400 mb-6">Connect with angel investors and early-stage VCs in Mumbai&apos;s thriving startup ecosystem.</p>
               <div className="flex flex-wrap gap-2">
                 <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">Angel Funding</span>
                 <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">Pre-Seed</span>
