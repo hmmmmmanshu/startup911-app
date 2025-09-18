@@ -193,6 +193,8 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => 
     amount_max: '',
     application_deadline: '',
     application_link: '',
+    industry: '',
+    stage: '',
     dpiit_required: false,
     tech_focus_required: false,
     patent_required: false,
@@ -306,33 +308,120 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => 
           />
         </div>
 
-        {/* Requirements */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-300 mb-4">Requirements & Focus Areas</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { key: 'dpiit_required', label: 'DPIIT Registration Required' },
-              { key: 'tech_focus_required', label: 'Tech Focus Required' },
-              { key: 'patent_required', label: 'Patent/IP Required' },
-              { key: 'prototype_required', label: 'Working Prototype Required' },
-              { key: 'technical_cofounder_required', label: 'Technical Co-founder Required' },
-              { key: 'full_time_commitment', label: 'Full-time Commitment' },
-              { key: 'women_led_focus', label: 'Women-led Focus' },
-              { key: 'student_focus', label: 'Student Focus' },
-              { key: 'mentorship_included', label: 'Mentorship Included' },
-              { key: 'workspace_provided', label: 'Workspace Provided' },
-              { key: 'network_access', label: 'Network Access' },
-            ].map(({ key, label }) => (
-              <label key={key} className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData[key as keyof typeof formData] as boolean}
-                  onChange={(e) => handleInputChange(key, e.target.checked)}
-                  className="w-4 h-4 text-green-600 bg-gray-800 border-gray-700 rounded focus:ring-green-500 focus:ring-2"
-                />
-                <span className="text-sm text-gray-300">{label}</span>
-              </label>
-            ))}
+        {/* Industry and Stage Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Industry Sector *
+            </label>
+            <select
+              value={formData.industry}
+              onChange={(e) => handleInputChange('industry', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+              required
+            >
+              <option value="">Select industry sector</option>
+              <option value="Technology & Software">Technology & Software</option>
+              <option value="Finance & Fintech">Finance & Fintech</option>
+              <option value="Healthcare & Biotech">Healthcare & Biotech</option>
+              <option value="E-commerce & Retail">E-commerce & Retail</option>
+              <option value="Education & EdTech">Education & EdTech</option>
+              <option value="Energy & Sustainability">Energy & Sustainability</option>
+              <option value="Agriculture & Food">Agriculture & Food</option>
+              <option value="Manufacturing">Manufacturing</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Startup Stage *
+            </label>
+            <select
+              value={formData.stage}
+              onChange={(e) => handleInputChange('stage', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+              required
+            >
+              <option value="">Select startup stage</option>
+              <option value="Idea Stage">Idea Stage</option>
+              <option value="MVP/Prototype">MVP/Prototype</option>
+              <option value="Early Revenue">Early Revenue</option>
+              <option value="Growth Stage">Growth Stage</option>
+              <option value="Late Stage">Late Stage</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Requirements - Organized by Categories */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-300 mb-4">Grant Requirements & Criteria</h3>
+          
+          {/* Technical Requirements */}
+          <div>
+            <h4 className="text-md font-medium text-gray-400 mb-3">Technical Requirements</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { key: 'dpiit_required', label: 'DPIIT Registration Required' },
+                { key: 'tech_focus_required', label: 'Tech Focus Required' },
+                { key: 'patent_required', label: 'Patent/IP Required' },
+                { key: 'prototype_required', label: 'Working Prototype Required' },
+                { key: 'technical_cofounder_required', label: 'Technical Co-founder Required' },
+                { key: 'full_time_commitment', label: 'Full-time Commitment Required' },
+              ].map(({ key, label }) => (
+                <label key={key} className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData[key as keyof typeof formData] as boolean}
+                    onChange={(e) => handleInputChange(key, e.target.checked)}
+                    className="w-4 h-4 text-green-600 bg-gray-800 border-gray-700 rounded focus:ring-green-500 focus:ring-2"
+                  />
+                  <span className="text-sm text-gray-300">{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Special Focus Areas */}
+          <div>
+            <h4 className="text-md font-medium text-gray-400 mb-3">Special Focus Areas</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { key: 'women_led_focus', label: 'Women-led Startup Focus' },
+                { key: 'student_focus', label: 'Student Startup Focus' },
+              ].map(({ key, label }) => (
+                <label key={key} className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData[key as keyof typeof formData] as boolean}
+                    onChange={(e) => handleInputChange(key, e.target.checked)}
+                    className="w-4 h-4 text-green-600 bg-gray-800 border-gray-700 rounded focus:ring-green-500 focus:ring-2"
+                  />
+                  <span className="text-sm text-gray-300">{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Support & Benefits */}
+          <div>
+            <h4 className="text-md font-medium text-gray-400 mb-3">Support & Benefits Included</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { key: 'mentorship_included', label: 'Mentorship Included' },
+                { key: 'workspace_provided', label: 'Workspace Provided' },
+                { key: 'network_access', label: 'Network Access Provided' },
+              ].map(({ key, label }) => (
+                <label key={key} className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData[key as keyof typeof formData] as boolean}
+                    onChange={(e) => handleInputChange(key, e.target.checked)}
+                    className="w-4 h-4 text-green-600 bg-gray-800 border-gray-700 rounded focus:ring-green-500 focus:ring-2"
+                  />
+                  <span className="text-sm text-gray-300">{label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 

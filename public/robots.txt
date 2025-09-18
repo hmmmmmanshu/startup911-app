@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /grants
+Allow: /vcs
+Allow: /mentors
+Allow: /blog
+Allow: /incubation-centres
+
+# Disallow admin and API routes
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth
+
+# Disallow temporary or test pages
+Disallow: /test-*
+
+# Sitemap location
+Sitemap: https://startup911.in/sitemap.xml
+
+# Crawl-delay for better server performance
+Crawl-delay: 1

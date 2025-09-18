@@ -21,13 +21,17 @@ export default function Header() {
           <span className="text-xs text-gray-400 ml-11 -mt-1">Your Virtual CFO from Day 1</span>
         </Link>
         <div className="hidden md:flex items-center space-x-1">
+          <Link href="/faq" className="px-4 py-2 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded-lg transition-all duration-300">
+            FAQ
+          </Link>
           <Link href="/contribute" className="px-4 py-2 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded-lg transition-all duration-300">
             Contribute
           </Link>
           <Link href="/blog" className="px-4 py-2 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded-lg transition-all duration-300">
             Blogs
           </Link>
-          <div className="w-px h-6 bg-white/20 mx-2"></div>
+          {/* Grant Snap link hidden to focus traffic on startup911 */}
+          {/* <div className="w-px h-6 bg-white/20 mx-2"></div>
           <a
             href="https://www.grantsnap.pro/"
             target="_blank"
@@ -35,7 +39,7 @@ export default function Header() {
             className="px-4 py-2 text-gray-300 hover:text-green-400 hover:bg-gray-700 rounded-lg transition-all duration-300"
           >
             Grant Snap
-          </a>
+          </a> */}
         </div>
       </nav>
     </header>

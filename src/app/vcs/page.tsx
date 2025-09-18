@@ -1,6 +1,27 @@
 import { createClient } from '../../../utils/supabase/server';
 import VCQuestionnaire from '../../../components/feature/VCQuestionnaire';
 import type { Tag } from '../../../lib/types';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Complete VC List India 2024 | 500+ Venture Capital Firms & Angel Investors',
+  description: 'Connect with venture capital firms in India. Complete VC directory with investment criteria, portfolio companies, and contact details. Find VCs in Bangalore, Mumbai, Delhi, and other startup hubs.',
+  keywords: 'venture capital india, VC list india, angel investors india, startup funding, venture capital firms, bangalore VCs, mumbai angel investors, delhi venture capital, startup investment, seed funding india',
+  openGraph: {
+    title: 'Complete VC List India 2024 | 500+ Venture Capital Firms & Angel Investors',
+    description: 'Connect with venture capital firms in India. Complete VC directory with investment criteria and contact details.',
+    url: 'https://startup911.in/vcs',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Complete VC List India 2024 | 500+ Venture Capital Firms & Angel Investors',
+    description: 'Connect with venture capital firms in India. Complete VC directory with investment criteria and contact details.',
+  },
+  alternates: {
+    canonical: 'https://startup911.in/vcs',
+  },
+};
 
 // This is a helper function to group our tags
 const groupTagsByType = (tags: Tag[]) => {

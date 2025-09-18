@@ -64,6 +64,16 @@ export default async function VCsResultsPage({ searchParams }: PageProps) {
       hasAnyMatch = true;
     }
 
+    // Recency bonus - prioritize recent contributions
+    const daysOld = Math.floor((Date.now() - new Date(vc.created_at).getTime()) / (1000 * 60 * 60 * 24));
+    if (daysOld <= 7) {
+      matchScore += 25; // Major boost for very recent (1 week)
+    } else if (daysOld <= 30) {
+      matchScore += 15; // Medium boost for recent (1 month)
+    } else if (daysOld <= 90) {
+      matchScore += 5; // Small boost for somewhat recent (3 months)
+    }
+
     return { ...vc, matchScore, hasAnyMatch };
   });
 

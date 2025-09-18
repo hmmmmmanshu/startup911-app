@@ -119,13 +119,45 @@ export async function POST(request: NextRequest) {
             const grantId = insertResult.data.id;
             const tagMappings = [];
 
-            // Map requirements to requirement tags
+            // Map industry selection
+            if (submissionData.industry) {
+              const { data: industryTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', submissionData.industry)
+                .eq('type', 'INDUSTRY')
+                .single();
+              
+              if (industryTag) {
+                tagMappings.push({ grant_id: grantId, tag_id: industryTag.id });
+              }
+            }
+
+            // Map stage selection
+            if (submissionData.stage) {
+              const { data: stageTag } = await supabase
+                .from('tags')
+                .select('id')
+                .eq('name', submissionData.stage)
+                .eq('type', 'STAGE')
+                .single();
+              
+              if (stageTag) {
+                tagMappings.push({ grant_id: grantId, tag_id: stageTag.id });
+              }
+            }
+
+            // Map ALL requirements to requirement tags (expanded list)
             const requirementMappings = [
               { field: 'dpiit_required', tagName: 'DPIIT Registration' },
+              { field: 'tech_focus_required', tagName: 'Tech Focus Required' },
               { field: 'patent_required', tagName: 'Patent/IP' },
               { field: 'prototype_required', tagName: 'Working Prototype' },
               { field: 'technical_cofounder_required', tagName: 'Technical Co-founder' },
-              { field: 'full_time_commitment', tagName: 'Full-time Commitment' }
+              { field: 'full_time_commitment', tagName: 'Full-time Commitment' },
+              { field: 'mentorship_included', tagName: 'Mentorship Included' },
+              { field: 'workspace_provided', tagName: 'Workspace Provided' },
+              { field: 'network_access', tagName: 'Network Access' }
             ];
 
             for (const mapping of requirementMappings) {
@@ -246,10 +278,20 @@ export async function POST(request: NextRequest) {
 
         } else if (submissionType === 'mentor') {
           // Insert into mentors table
+          // Handle both old structure (superpower) and new structure (sector + functional_expertise)
+          let superpowerValue = '';
+          if (submissionData.sector || submissionData.functional_expertise) {
+            // New structure
+            superpowerValue = `${submissionData.sector || ''}${submissionData.sector && submissionData.functional_expertise ? ' | ' : ''}${submissionData.functional_expertise || ''}`.trim();
+          } else if (submissionData.superpower) {
+            // Old structure
+            superpowerValue = submissionData.superpower as string;
+          }
+          
           const mentorData = {
             name: submissionData.name,
             photo_url: submissionData.photo_url,
-            superpower: `${submissionData.sector || ''}${submissionData.sector && submissionData.functional_expertise ? ' | ' : ''}${submissionData.functional_expertise || ''}`.trim(),
+            superpower: superpowerValue,
             about: submissionData.about,
             rate_tier: submissionData.rate_tier,
             languages: submissionData.languages || [],
@@ -269,8 +311,10 @@ export async function POST(request: NextRequest) {
             const tagMappings = [];
 
             // Map sector and functional expertise to tags
+            // Handle both old and new submission structures
             const sector = submissionData.sector as string;
             const functionalExpertise = submissionData.functional_expertise as string;
+            const oldSuperpower = submissionData.superpower as string;
             
             // Direct mapping for exact matches with industry tags
             const industryMappings: Record<string, string> = {
@@ -295,31 +339,72 @@ export async function POST(request: NextRequest) {
               'Human Resources & Talent': 'Human Resources & Talent'
             };
 
-            // Map industry sector
-            if (sector && industryMappings[sector]) {
-              const { data: industryTag } = await supabase
-                .from('tags')
-                .select('id')
-                .eq('name', industryMappings[sector])
-                .eq('type', 'INDUSTRY')
-                .single();
-              
-              if (industryTag) {
-                tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
+            // Handle new structure (sector + functional_expertise)
+            if (sector || functionalExpertise) {
+              // Map industry sector
+              if (sector && industryMappings[sector]) {
+                const { data: industryTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', industryMappings[sector])
+                  .eq('type', 'INDUSTRY')
+                  .single();
+                
+                if (industryTag) {
+                  tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
+                }
               }
-            }
 
-            // Map functional expertise
-            if (functionalExpertise && expertiseMappings[functionalExpertise]) {
-              const { data: expertiseTag } = await supabase
-                .from('tags')
-                .select('id')
-                .eq('name', expertiseMappings[functionalExpertise])
-                .eq('type', 'EXPERTISE')
-                .single();
+              // Map functional expertise
+              if (functionalExpertise && expertiseMappings[functionalExpertise]) {
+                const { data: expertiseTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', expertiseMappings[functionalExpertise])
+                  .eq('type', 'EXPERTISE')
+                  .single();
+                
+                if (expertiseTag) {
+                  tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
+                }
+              }
+            } 
+            // Handle old structure (superpower field)
+            else if (oldSuperpower) {
+              // Try to match against industry tags first
+              for (const [key, value] of Object.entries(industryMappings)) {
+                if (oldSuperpower.toLowerCase().includes(key.toLowerCase()) || 
+                    key.toLowerCase().includes(oldSuperpower.toLowerCase())) {
+                  const { data: industryTag } = await supabase
+                    .from('tags')
+                    .select('id')
+                    .eq('name', value)
+                    .eq('type', 'INDUSTRY')
+                    .single();
+                  
+                  if (industryTag) {
+                    tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
+                    break;
+                  }
+                }
+              }
               
-              if (expertiseTag) {
-                tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
+              // Try to match against expertise tags
+              for (const [key, value] of Object.entries(expertiseMappings)) {
+                if (oldSuperpower.toLowerCase().includes(key.toLowerCase()) || 
+                    key.toLowerCase().includes(oldSuperpower.toLowerCase())) {
+                  const { data: expertiseTag } = await supabase
+                    .from('tags')
+                    .select('id')
+                    .eq('name', value)
+                    .eq('type', 'EXPERTISE')
+                    .single();
+                  
+                  if (expertiseTag) {
+                    tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
+                    break;
+                  }
+                }
               }
             }
 

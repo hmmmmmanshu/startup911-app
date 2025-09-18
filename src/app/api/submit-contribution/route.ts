@@ -43,11 +43,31 @@ export async function POST(request: NextRequest) {
       if (!submission_data.name) validationErrors.push('Grant name is required');
       if (!submission_data.organization) validationErrors.push('Organization is required');
       if (!submission_data.details) validationErrors.push('Grant details are required');
+      if (!submission_data.industry) validationErrors.push('Industry sector is required');
+      if (!submission_data.stage) validationErrors.push('Startup stage is required');
     } else if (submission_type === 'vc') {
       if (!submission_data.name) validationErrors.push('VC firm name is required');
     } else if (submission_type === 'mentor') {
       if (!submission_data.name) validationErrors.push('Mentor name is required');
       if (!submission_data.about) validationErrors.push('About section is required');
+      
+      // Validate new structure (sector + functional_expertise) or old structure (superpower)
+      const hasNewStructure = submission_data.sector || submission_data.functional_expertise;
+      const hasOldStructure = submission_data.superpower && submission_data.superpower !== '';
+      
+      if (!hasNewStructure && !hasOldStructure) {
+        validationErrors.push('Expertise information is required - please select both sector and functional expertise');
+      }
+      
+      // If using new structure, validate both fields are provided
+      if (hasNewStructure && (!submission_data.sector || !submission_data.functional_expertise)) {
+        validationErrors.push('Both industry sector and functional expertise must be selected');
+      }
+      
+      // Validate rate tier is provided
+      if (!submission_data.rate_tier || submission_data.rate_tier === '') {
+        validationErrors.push('Rate tier must be selected');
+      }
     } else if (submission_type === 'incubation_centre') {
       if (!submission_data.name) validationErrors.push('Incubation centre name is required');
     } else if (submission_type === 'post') {

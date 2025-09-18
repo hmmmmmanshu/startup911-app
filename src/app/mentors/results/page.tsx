@@ -108,6 +108,16 @@ export default async function MentorsResultsPage({
       }
     }
     
+    // Recency bonus - prioritize recent contributions
+    const daysOld = Math.floor((Date.now() - new Date(mentor.created_at).getTime()) / (1000 * 60 * 60 * 24));
+    if (daysOld <= 7) {
+      matchScore += 25; // Major boost for very recent (1 week)
+    } else if (daysOld <= 30) {
+      matchScore += 15; // Medium boost for recent (1 month)
+    } else if (daysOld <= 90) {
+      matchScore += 5; // Small boost for somewhat recent (3 months)
+    }
+    
     // Base score if no specific criteria
     if (selectedIndustryIds.length === 0 && selectedExpertiseIds.length === 0) {
       matchScore += 10; // Small boost for being in the pool

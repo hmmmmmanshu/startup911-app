@@ -1,4 +1,25 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Top 100+ Startup Grants India 2024 | Government & Private Funding',
+  description: 'Find startup grants in India - NIDHI grants, Startup India schemes, government funding, and private grants. Complete directory of funding opportunities for Indian entrepreneurs with eligibility criteria and application deadlines.',
+  keywords: 'startup grants india, government grants for startups, NIDHI grants, startup india scheme, funding for startups, government funding schemes, private grants startups, startup funding india, BIRAC grants, DST grants',
+  openGraph: {
+    title: 'Top 100+ Startup Grants India 2024 | Government & Private Funding',
+    description: 'Find startup grants in India - NIDHI grants, Startup India schemes, government funding, and private grants.',
+    url: 'https://startup911.in/grants',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Top 100+ Startup Grants India 2024 | Government & Private Funding',
+    description: 'Find startup grants in India - NIDHI grants, Startup India schemes, government funding, and private grants.',
+  },
+  alternates: {
+    canonical: 'https://startup911.in/grants',
+  },
+};
 
 // Choice card component matching the homepage style
 const GrantsChoiceCard = ({ href, title, description, icon }: { href: string; title: string; description: string; icon: React.ReactNode }) => {
@@ -40,14 +61,14 @@ export default function GrantsLandingPage() {
 
         {/* Title Section */}
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
-          Funding & Support
+          Startup Grants India 2024
         </h1>
         <div className="w-24 h-1 bg-green-500 mx-auto my-4"></div>
         <p className="text-gray-400 tracking-widest uppercase mb-8">
           Choose Your Path to Growth
         </p>
         <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-16">
-          Whether you&apos;re looking for grants and funding opportunities or seeking incubation support, we&apos;ve got you covered.
+          Access 100+ government grants, NIDHI funding, Startup India schemes, and private funding opportunities. Find the perfect grant for your startup stage and industry with detailed eligibility criteria and application deadlines.
         </p>
 
         {/* The Card Section */}

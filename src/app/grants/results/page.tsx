@@ -55,11 +55,14 @@ export default async function GrantsResultsPage({ searchParams }: PageProps) {
             hasAnyMatch = true;
         }
         
-        // Add recency bias - newer grants get a small boost (only if they have matches)
-        if (hasAnyMatch) {
-            const daysSinceCreated = Math.floor((Date.now() - new Date(grant.created_at).getTime()) / (1000 * 60 * 60 * 24));
-            if (daysSinceCreated <= 30) matchScore += 5; // Recent grants (last 30 days) get +5 points
-            else if (daysSinceCreated <= 90) matchScore += 2; // Semi-recent grants (last 90 days) get +2 points
+        // Add recency bias - prioritize recent contributions (even without matches)
+        const daysSinceCreated = Math.floor((Date.now() - new Date(grant.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        if (daysSinceCreated <= 7) {
+            matchScore += 25; // Very recent grants (1 week) get major boost
+        } else if (daysSinceCreated <= 30) {
+            matchScore += 15; // Recent grants (last 30 days) get significant boost
+        } else if (daysSinceCreated <= 90) {
+            matchScore += 8; // Semi-recent grants (last 90 days) get moderate boost
         }
         
         // Handle eligibility based on search type
