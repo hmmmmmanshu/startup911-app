@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Briefcase, Brain, Handshake, Rocket } from 'lucide-react';
+import { Briefcase, Brain, Handshake } from 'lucide-react';
 
 // Reusable Card for the main choices
 const ChoiceCard = ({ href, title, description, icon }: { href: string; title: string; description: string; icon: React.ReactNode }) => {
@@ -120,30 +120,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Grant Snap Feature Section */}
-      <section id="grant-snap" className="py-20 bg-[#121212]">
-        <div className="container mx-auto px-6 text-center max-w-4xl">
-          <div className="mb-4 inline-flex items-center justify-center px-4 py-1 text-sm font-semibold text-green-300 bg-green-500/10 rounded-full">
-            <Rocket className="w-4 h-4 mr-2" /> Our Flagship Product
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white">
-            Supercharge Your Grant Applications with Grant Snap
-          </h2>
-          <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
-            Stop wasting hours filling out the same information on endless grant forms. Our browser extension automates the tedious work so you can focus on what matters most: building your company.
-          </p>
-          <div className="mt-8">
-            <a 
-              href="https://www.grantsnap.pro/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-8 py-4 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-500/40 hover:bg-green-700 hover:scale-105 transform transition-all duration-300"
-            >
-              Learn More & Get Started
-            </a>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
