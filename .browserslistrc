@@ -1,0 +1,11 @@
+# Modern browsers that support ES2022 features
+# This reduces legacy JavaScript polyfills
+
+> 0.2%
+last 2 versions
+not dead
+not ie 11
+not chrome < 84
+not firefox < 78
+not safari < 14
+not edge < 84
