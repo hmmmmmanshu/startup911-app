@@ -92,9 +92,12 @@ export async function POST(request: NextRequest) {
             organization: submissionData.organization,
             details: submissionData.details,
             status: submissionData.status || 'Active',
+            amount_min: submissionData.amount_min,
             amount_max: submissionData.amount_max,
+            amount_currency: submissionData.amount_currency || 'INR',
             application_deadline: submissionData.application_deadline,
             application_link: submissionData.application_link,
+            geographical_focus: submissionData.geographical_focus || [],
             dpiit_required: submissionData.dpiit_required || false,
             tech_focus_required: submissionData.tech_focus_required || false,
             patent_required: submissionData.patent_required || false,
@@ -119,31 +122,65 @@ export async function POST(request: NextRequest) {
             const grantId = insertResult.data.id;
             const tagMappings = [];
 
-            // Map industry selection
-            if (submissionData.industry) {
-              const { data: industryTag } = await supabase
-                .from('tags')
-                .select('id')
-                .eq('name', submissionData.industry)
-                .eq('type', 'INDUSTRY')
-                .single();
-              
-              if (industryTag) {
-                tagMappings.push({ grant_id: grantId, tag_id: industryTag.id });
+            // Map industry sectors (multi-select)
+            if (submissionData.industry_sectors && Array.isArray(submissionData.industry_sectors)) {
+              for (const industry of submissionData.industry_sectors) {
+                const { data: industryTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', industry)
+                  .eq('type', 'INDUSTRY')
+                  .single();
+                
+                if (industryTag) {
+                  tagMappings.push({ grant_id: grantId, tag_id: industryTag.id });
+                }
               }
             }
 
-            // Map stage selection
-            if (submissionData.stage) {
-              const { data: stageTag } = await supabase
+            // Map startup stages (multi-select)
+            if (submissionData.startup_stages && Array.isArray(submissionData.startup_stages)) {
+              for (const stage of submissionData.startup_stages) {
+                const { data: stageTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', stage)
+                  .eq('type', 'STAGE')
+                  .single();
+                
+                if (stageTag) {
+                  tagMappings.push({ grant_id: grantId, tag_id: stageTag.id });
+                }
+              }
+            }
+
+            // Map geographical focus (multi-select)
+            if (submissionData.geographical_focus && Array.isArray(submissionData.geographical_focus)) {
+              for (const region of submissionData.geographical_focus) {
+                const { data: regionTag } = await supabase
+                  .from('tags')
+                  .select('id')
+                  .eq('name', region)
+                  .eq('type', 'REGION')
+                  .single();
+                
+                if (regionTag) {
+                  tagMappings.push({ grant_id: grantId, tag_id: regionTag.id });
+                }
+              }
+            }
+
+            // Map currency
+            if (submissionData.amount_currency) {
+              const { data: currencyTag } = await supabase
                 .from('tags')
                 .select('id')
-                .eq('name', submissionData.stage)
-                .eq('type', 'STAGE')
+                .eq('name', submissionData.amount_currency)
+                .eq('type', 'CURRENCY')
                 .single();
               
-              if (stageTag) {
-                tagMappings.push({ grant_id: grantId, tag_id: stageTag.id });
+              if (currencyTag) {
+                tagMappings.push({ grant_id: grantId, tag_id: currencyTag.id });
               }
             }
 
@@ -213,6 +250,9 @@ export async function POST(request: NextRequest) {
             country_based_of: submissionData.country_based_of,
             about: submissionData.about,
             key_person: submissionData.key_person,
+            sector: Array.isArray(submissionData.sectors) ? submissionData.sectors.join(', ') : submissionData.sector,
+            stage_focus: Array.isArray(submissionData.stage_focus) ? submissionData.stage_focus.join(', ') : submissionData.stage_focus,
+            region_focus: Array.isArray(submissionData.region_focus) ? submissionData.region_focus.join(', ') : submissionData.region_focus,
           };
 
           insertResult = await supabase
@@ -226,12 +266,15 @@ export async function POST(request: NextRequest) {
             const vcId = insertResult.data.id;
             const tagMappings = [];
 
-            // Map sector to industry tag
-            if (submissionData.sector) {
+            // Map sectors to industry tags (multi-select)
+            const sectorsArray = Array.isArray(submissionData.sectors) ? submissionData.sectors : 
+                                submissionData.sector ? [submissionData.sector] : [];
+            
+            for (const sector of sectorsArray) {
               const { data: industryTag } = await supabase
                 .from('tags')
                 .select('id')
-                .eq('name', submissionData.sector)
+                .eq('name', sector)
                 .eq('type', 'INDUSTRY')
                 .single();
               
@@ -240,12 +283,15 @@ export async function POST(request: NextRequest) {
               }
             }
 
-            // Map stage_focus to stage tag
-            if (submissionData.stage_focus) {
+            // Map stage_focus to stage tags (multi-select)
+            const stagesArray = Array.isArray(submissionData.stage_focus) ? submissionData.stage_focus : 
+                               submissionData.stage_focus ? [submissionData.stage_focus] : [];
+            
+            for (const stage of stagesArray) {
               const { data: stageTag } = await supabase
                 .from('tags')
                 .select('id')
-                .eq('name', submissionData.stage_focus)
+                .eq('name', stage)
                 .eq('type', 'STAGE')
                 .single();
               
@@ -254,12 +300,15 @@ export async function POST(request: NextRequest) {
               }
             }
 
-            // Map region_focus to region tag
-            if (submissionData.region_focus) {
+            // Map region_focus to region tags (multi-select)
+            const regionsArray = Array.isArray(submissionData.region_focus) ? submissionData.region_focus : 
+                                 submissionData.region_focus ? [submissionData.region_focus] : [];
+            
+            for (const region of regionsArray) {
               const { data: regionTag } = await supabase
                 .from('tags')
                 .select('id')
-                .eq('name', submissionData.region_focus)
+                .eq('name', region)
                 .eq('type', 'REGION')
                 .single();
               
@@ -278,11 +327,19 @@ export async function POST(request: NextRequest) {
 
         } else if (submissionType === 'mentor') {
           // Insert into mentors table
-          // Handle both old structure (superpower) and new structure (sector + functional_expertise)
+          // Handle both old structure (superpower) and new structure (sectors + functional_expertise)
           let superpowerValue = '';
-          if (submissionData.sector || submissionData.functional_expertise) {
-            // New structure
-            superpowerValue = `${submissionData.sector || ''}${submissionData.sector && submissionData.functional_expertise ? ' | ' : ''}${submissionData.functional_expertise || ''}`.trim();
+          
+          // Handle new multi-select structure
+          if (submissionData.sectors || submissionData.functional_expertise) {
+            const sectorsArray = Array.isArray(submissionData.sectors) ? submissionData.sectors : 
+                                submissionData.sector ? [submissionData.sector] : [];
+            const expertiseArray = Array.isArray(submissionData.functional_expertise) ? submissionData.functional_expertise : 
+                                  submissionData.functional_expertise ? [submissionData.functional_expertise] : [];
+            
+            const sectorsStr = sectorsArray.join(', ');
+            const expertiseStr = expertiseArray.join(', ');
+            superpowerValue = `${sectorsStr}${sectorsStr && expertiseStr ? ' | ' : ''}${expertiseStr}`.trim();
           } else if (submissionData.superpower) {
             // Old structure
             superpowerValue = submissionData.superpower as string;
@@ -292,6 +349,8 @@ export async function POST(request: NextRequest) {
             name: submissionData.name,
             photo_url: submissionData.photo_url,
             superpower: superpowerValue,
+            sector: Array.isArray(submissionData.sectors) ? submissionData.sectors.join(', ') : submissionData.sector,
+            functional_expertise: Array.isArray(submissionData.functional_expertise) ? submissionData.functional_expertise.join(', ') : submissionData.functional_expertise,
             about: submissionData.about,
             rate_tier: submissionData.rate_tier,
             languages: submissionData.languages || [],
@@ -310,10 +369,12 @@ export async function POST(request: NextRequest) {
             const mentorId = insertResult.data.id;
             const tagMappings = [];
 
-            // Map sector and functional expertise to tags
+            // Map sectors and functional expertise to tags (multi-select)
             // Handle both old and new submission structures
-            const sector = submissionData.sector as string;
-            const functionalExpertise = submissionData.functional_expertise as string;
+            const sectorsArray = Array.isArray(submissionData.sectors) ? submissionData.sectors : 
+                                submissionData.sector ? [submissionData.sector] : [];
+            const expertiseArray = Array.isArray(submissionData.functional_expertise) ? submissionData.functional_expertise : 
+                                  submissionData.functional_expertise ? [submissionData.functional_expertise] : [];
             const oldSuperpower = submissionData.superpower as string;
             
             // Direct mapping for exact matches with industry tags
@@ -325,7 +386,15 @@ export async function POST(request: NextRequest) {
               'Education & EdTech': 'Education & EdTech',
               'Energy & Sustainability': 'Energy & Sustainability',
               'Agriculture & Food': 'Agriculture & Food',
-              'Manufacturing': 'Manufacturing'
+              'Manufacturing': 'Manufacturing',
+              'Media & Entertainment': 'Media & Entertainment',
+              'Real Estate & PropTech': 'Real Estate & PropTech',
+              'Transportation & Logistics': 'Transportation & Logistics',
+              'Gaming & Sports': 'Gaming & Sports',
+              'Travel & Tourism': 'Travel & Tourism',
+              'Social Impact': 'Social Impact',
+              'DeepTech & AI': 'DeepTech & AI',
+              'Blockchain & Web3': 'Blockchain & Web3'
             };
 
             // Direct mapping for functional expertise
@@ -336,36 +405,47 @@ export async function POST(request: NextRequest) {
               'Fundraising & Investment': 'Fundraising & Investment',
               'Legal & Compliance': 'Legal & Compliance',
               'Sales & Business Development': 'Sales & Business Development',
-              'Human Resources & Talent': 'Human Resources & Talent'
+              'Human Resources & Talent': 'Human Resources & Talent',
+              'Technology & Engineering': 'Technology & Engineering',
+              'Data & Analytics': 'Data & Analytics',
+              'Design & UX': 'Design & UX',
+              'Finance & Accounting': 'Finance & Accounting',
+              'Strategy & Planning': 'Strategy & Planning',
+              'International Expansion': 'International Expansion',
+              'Partnerships & Alliances': 'Partnerships & Alliances'
             };
 
-            // Handle new structure (sector + functional_expertise)
-            if (sector || functionalExpertise) {
-              // Map industry sector
-              if (sector && industryMappings[sector]) {
-                const { data: industryTag } = await supabase
-                  .from('tags')
-                  .select('id')
-                  .eq('name', industryMappings[sector])
-                  .eq('type', 'INDUSTRY')
-                  .single();
-                
-                if (industryTag) {
-                  tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
+            // Handle new structure (multi-select sectors + functional_expertise)
+            if (sectorsArray.length > 0 || expertiseArray.length > 0) {
+              // Map industry sectors (multi-select)
+              for (const sector of sectorsArray) {
+                if (industryMappings[sector]) {
+                  const { data: industryTag } = await supabase
+                    .from('tags')
+                    .select('id')
+                    .eq('name', industryMappings[sector])
+                    .eq('type', 'INDUSTRY')
+                    .single();
+                  
+                  if (industryTag) {
+                    tagMappings.push({ mentor_id: mentorId, tag_id: industryTag.id });
+                  }
                 }
               }
 
-              // Map functional expertise
-              if (functionalExpertise && expertiseMappings[functionalExpertise]) {
-                const { data: expertiseTag } = await supabase
-                  .from('tags')
-                  .select('id')
-                  .eq('name', expertiseMappings[functionalExpertise])
-                  .eq('type', 'EXPERTISE')
-                  .single();
-                
-                if (expertiseTag) {
-                  tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
+              // Map functional expertise (multi-select)
+              for (const expertise of expertiseArray) {
+                if (expertiseMappings[expertise]) {
+                  const { data: expertiseTag } = await supabase
+                    .from('tags')
+                    .select('id')
+                    .eq('name', expertiseMappings[expertise])
+                    .eq('type', 'EXPERTISE')
+                    .single();
+                  
+                  if (expertiseTag) {
+                    tagMappings.push({ mentor_id: mentorId, tag_id: expertiseTag.id });
+                  }
                 }
               }
             } 

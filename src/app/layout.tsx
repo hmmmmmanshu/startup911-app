@@ -49,10 +49,11 @@ export const metadata: Metadata = {
     siteName: 'Startup911',
     images: [
       {
-        url: '/logo.png',
+        url: 'https://startup911.in/social-preview.png',
         width: 1200,
         height: 630,
-        alt: 'Startup911 - Startup Grants India',
+        alt: 'Startup911 - Find Startup Grants, VCs & Mentors in India',
+        type: 'image/png',
       },
     ],
   },
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     description: 'Find 100+ startup grants in India, venture capital firms, and funding opportunities. Complete VC list and government grants directory.',
     creator: '@Startup_911',
     site: '@Startup_911',
-    images: ['/logo.png'],
+    images: ['https://startup911.in/twitter-card.png'],
   },
   verification: {
     google: 'your-google-verification-code',
@@ -108,6 +109,25 @@ export default function RootLayout({
         <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
         <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        
+        {/* Additional Social Media Meta Tags */}
+        <meta property="og:site_name" content="Startup911" />
+        <meta property="og:locale" content="en_IN" />
+        <meta property="article:author" content="Startup911" />
+        <meta name="twitter:site" content="@Startup_911" />
+        <meta name="twitter:creator" content="@Startup_911" />
+        
+        {/* WhatsApp specific tags */}
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        
+        {/* LinkedIn specific tags */}
+        <meta property="og:updated_time" content={new Date().toISOString()} />
+        
+        {/* Additional Twitter Card optimization */}
+        <meta name="twitter:domain" content="startup911.in" />
+        <meta name="twitter:url" content="https://startup911.in" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#000000" />
         <meta name="msapplication-TileColor" content="#000000" />

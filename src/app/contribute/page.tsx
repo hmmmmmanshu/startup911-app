@@ -2,6 +2,17 @@
 
 import { useState } from 'react';
 import { Briefcase, Brain, Handshake, CheckCircle, AlertCircle } from 'lucide-react';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { 
+  INDUSTRY_OPTIONS, 
+  STARTUP_STAGE_OPTIONS, 
+  REGION_OPTIONS, 
+  EXPERTISE_OPTIONS,
+  LANGUAGE_OPTIONS,
+  RATE_TIER_OPTIONS,
+  CURRENCY_OPTIONS,
+  VC_SECTOR_OPTIONS
+} from '@/lib/constants/form-options';
 
 // Submission type definition
 type SubmissionType = 'grant' | 'vc' | 'mentor';
@@ -190,11 +201,14 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => 
     organization: '',
     details: '',
     status: 'Active',
+    amount_min: '',
     amount_max: '',
+    amount_currency: 'INR',
     application_deadline: '',
     application_link: '',
-    industry: '',
-    stage: '',
+    industry_sectors: [] as string[],
+    startup_stages: [] as string[],
+    geographical_focus: [] as string[],
     dpiit_required: false,
     tech_focus_required: false,
     patent_required: false,
@@ -207,6 +221,8 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => 
     workspace_provided: false,
     network_access: false,
   });
+
+  // Using unified constants for consistency
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,18 +284,53 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => 
         </div>
 
         {/* Financial Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-300">Grant Amount</h3>
+          
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Maximum Amount
+              Currency *
             </label>
-            <input
-              type="text"
-              value={formData.amount_max}
-              onChange={(e) => handleInputChange('amount_max', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
-              placeholder="e.g., Up to ₹50 Lakhs"
-            />
+            <select
+              value={formData.amount_currency}
+              onChange={(e) => handleInputChange('amount_currency', e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
+              required
+            >
+              {CURRENCY_OPTIONS.map(currency => (
+                <option key={currency.code} value={currency.code}>
+                  {currency.symbol} {currency.code} - {currency.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Minimum Amount
+              </label>
+              <input
+                type="text"
+                value={formData.amount_min}
+                onChange={(e) => handleInputChange('amount_min', e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
+                placeholder={`e.g., ${CURRENCY_OPTIONS.find(c => c.code === formData.amount_currency)?.symbol}1 Lakh`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Maximum Amount
+              </label>
+              <input
+                type="text"
+                value={formData.amount_max}
+                onChange={(e) => handleInputChange('amount_max', e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
+                placeholder={`e.g., ${CURRENCY_OPTIONS.find(c => c.code === formData.amount_currency)?.symbol}50 Lakhs`}
+              />
+            </div>
           </div>
 
           <div>
@@ -308,47 +359,56 @@ function GrantForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => 
           />
         </div>
 
-        {/* Industry and Stage Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Multi-Select Targeting */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-300">Grant Targeting & Focus</h3>
+          
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Industry Sector *
+              Industry Sectors *
             </label>
-            <select
-              value={formData.industry}
-              onChange={(e) => handleInputChange('industry', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-              required
-            >
-              <option value="">Select industry sector</option>
-              <option value="Technology & Software">Technology & Software</option>
-              <option value="Finance & Fintech">Finance & Fintech</option>
-              <option value="Healthcare & Biotech">Healthcare & Biotech</option>
-              <option value="E-commerce & Retail">E-commerce & Retail</option>
-              <option value="Education & EdTech">Education & EdTech</option>
-              <option value="Energy & Sustainability">Energy & Sustainability</option>
-              <option value="Agriculture & Food">Agriculture & Food</option>
-              <option value="Manufacturing">Manufacturing</option>
-            </select>
+            <MultiSelect
+              options={[...INDUSTRY_OPTIONS]}
+              value={formData.industry_sectors}
+              onChange={(value) => handleInputChange('industry_sectors', value)}
+              placeholder="Select industry sectors this grant targets..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all industry sectors this grant is suitable for
+            </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Startup Stage *
+              Startup Stages *
             </label>
-            <select
-              value={formData.stage}
-              onChange={(e) => handleInputChange('stage', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-              required
-            >
-              <option value="">Select startup stage</option>
-              <option value="Idea Stage">Idea Stage</option>
-              <option value="MVP/Prototype">MVP/Prototype</option>
-              <option value="Early Revenue">Early Revenue</option>
-              <option value="Growth Stage">Growth Stage</option>
-              <option value="Late Stage">Late Stage</option>
-            </select>
+            <MultiSelect
+              options={[...STARTUP_STAGE_OPTIONS]}
+              value={formData.startup_stages}
+              onChange={(value) => handleInputChange('startup_stages', value)}
+              placeholder="Select startup stages this grant targets..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all startup stages this grant is suitable for
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Geographical Focus
+            </label>
+            <MultiSelect
+              options={[...REGION_OPTIONS]}
+              value={formData.geographical_focus}
+              onChange={(value) => handleInputChange('geographical_focus', value)}
+              placeholder="Select geographical regions this grant focuses on..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select regions where this grant is available or prioritized
+            </p>
           </div>
         </div>
 
@@ -445,43 +505,22 @@ function VCForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => voi
     country_based_of: '',
     about: '',
     key_person: '',
-    sector: '',
+    sectors: [] as string[],
     area_info: '',
-    stage_focus: '',
-    region_focus: '',
+    stage_focus: [] as string[],
+    region_focus: [] as string[],
   });
+
+  // Using unified constants for consistency
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  // Predefined options for dropdowns
-  const stageOptions = [
-    'Pre-Seed',
-    'Seed',
-    'Series A',
-    'Series B',
-    'Series C+',
-    'Growth Stage',
-    'Late Stage',
-    'All Stages'
-  ];
-
-  const regionOptions = [
-    'India',
-    'North America',
-    'Europe',
-    'Southeast Asia',
-    'Middle East',
-    'Africa',
-    'Global',
-    'Asia Pacific'
-  ];
 
   return (
     <div>
@@ -530,74 +569,69 @@ function VCForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => voi
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Country/Region
-            </label>
-            <input
-              type="text"
-              value={formData.country_based_of}
-              onChange={(e) => handleInputChange('country_based_of', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
-              placeholder="e.g., India, Singapore, Global"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Sector Focus
-            </label>
-            <select
-              value={formData.sector}
-              onChange={(e) => handleInputChange('sector', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-            >
-              <option value="">Select a sector</option>
-              <option value="Technology & Software">Technology & Software</option>
-              <option value="Finance & Fintech">Finance & Fintech</option>
-              <option value="Healthcare & Biotech">Healthcare & Biotech</option>
-              <option value="E-commerce & Retail">E-commerce & Retail</option>
-              <option value="Education & EdTech">Education & EdTech</option>
-              <option value="Energy & Sustainability">Energy & Sustainability</option>
-              <option value="Agriculture & Food">Agriculture & Food</option>
-              <option value="Manufacturing">Manufacturing</option>
-              <option value="Sector Agnostic">Sector Agnostic</option>
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Country/Region Based
+          </label>
+          <input
+            type="text"
+            value={formData.country_based_of}
+            onChange={(e) => handleInputChange('country_based_of', e.target.value)}
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none"
+            placeholder="e.g., India, Singapore, Global"
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Multi-Select Investment Focus */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-300">Investment Focus</h3>
+          
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Stage Focus
+              Sector Focus *
             </label>
-            <select
-              value={formData.stage_focus}
-              onChange={(e) => handleInputChange('stage_focus', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-            >
-              <option value="">Select investment stage</option>
-              {stageOptions.map(stage => (
-                <option key={stage} value={stage}>{stage}</option>
-              ))}
-            </select>
+            <MultiSelect
+              options={[...VC_SECTOR_OPTIONS]}
+              value={formData.sectors}
+              onChange={(value) => handleInputChange('sectors', value)}
+              placeholder="Select sectors you invest in..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all sectors your VC firm invests in
+            </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Geographic Focus
+              Investment Stages *
             </label>
-            <select
+            <MultiSelect
+              options={[...STARTUP_STAGE_OPTIONS]}
+              value={formData.stage_focus}
+              onChange={(value) => handleInputChange('stage_focus', value)}
+              placeholder="Select investment stages..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all investment stages your firm focuses on
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Geographic Focus *
+            </label>
+            <MultiSelect
+              options={[...REGION_OPTIONS]}
               value={formData.region_focus}
-              onChange={(e) => handleInputChange('region_focus', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-            >
-              <option value="">Select geographic focus</option>
-              {regionOptions.map(region => (
-                <option key={region} value={region}>{region}</option>
-              ))}
-            </select>
+              onChange={(value) => handleInputChange('region_focus', value)}
+              placeholder="Select geographic regions..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all regions where your firm invests
+            </p>
           </div>
         </div>
 
@@ -658,8 +692,8 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
   const [formData, setFormData] = useState({
     name: '',
     photo_url: '',
-    sector: '',
-    functional_expertise: '',
+    sectors: [] as string[],
+    functional_expertise: [] as string[],
     about: '',
     rate_tier: '',
     languages: [] as string[],
@@ -669,12 +703,7 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
-  const availableLanguages = [
-    'English', 'Hindi', 'Bengali', 'Marathi', 'Telugu', 'Tamil', 
-    'Gujarati', 'Urdu', 'Kannada', 'Malayalam', 'Punjabi'
-  ];
-
-  const rateTiers = ['Free', '<₹1K', '₹1K-3K', '₹3K-5K', '₹5K+'];
+  // Using unified constants for consistency
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -823,48 +852,40 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Multi-Select Expertise */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-300">Your Expertise</h3>
+          
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Industry Sector *
+              Industry Sectors *
             </label>
-            <select
-              value={formData.sector}
-              onChange={(e) => handleInputChange('sector', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-              required
-            >
-              <option value="">Select your industry sector</option>
-              <option value="Technology & Software">Technology & Software</option>
-              <option value="Finance & Fintech">Finance & Fintech</option>
-              <option value="Healthcare & Biotech">Healthcare & Biotech</option>
-              <option value="E-commerce & Retail">E-commerce & Retail</option>
-              <option value="Education & EdTech">Education & EdTech</option>
-              <option value="Energy & Sustainability">Energy & Sustainability</option>
-              <option value="Agriculture & Food">Agriculture & Food</option>
-              <option value="Manufacturing">Manufacturing</option>
-            </select>
+            <MultiSelect
+              options={[...INDUSTRY_OPTIONS]}
+              value={formData.sectors}
+              onChange={(value) => handleInputChange('sectors', value)}
+              placeholder="Select industry sectors you have experience in..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all industry sectors where you can provide mentorship
+            </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Functional Expertise *
             </label>
-            <select
+            <MultiSelect
+              options={[...EXPERTISE_OPTIONS]}
               value={formData.functional_expertise}
-              onChange={(e) => handleInputChange('functional_expertise', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
-              required
-            >
-              <option value="">Select your functional expertise</option>
-              <option value="Product Strategy">Product Strategy</option>
-              <option value="Marketing & Growth">Marketing & Growth</option>
-              <option value="Operations & Scaling">Operations & Scaling</option>
-              <option value="Fundraising & Investment">Fundraising & Investment</option>
-              <option value="Legal & Compliance">Legal & Compliance</option>
-              <option value="Sales & Business Development">Sales & Business Development</option>
-              <option value="Human Resources & Talent">Human Resources & Talent</option>
-            </select>
+              onChange={(value) => handleInputChange('functional_expertise', value)}
+              placeholder="Select your functional expertise areas..."
+              className="w-full"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Select all functional areas where you can provide guidance
+            </p>
           </div>
         </div>
 
@@ -892,7 +913,7 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
             className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none"
           >
             <option value="">Select rate tier</option>
-            {rateTiers.map(tier => (
+            {RATE_TIER_OPTIONS.map(tier => (
               <option key={tier} value={tier}>{tier} per hour</option>
             ))}
           </select>
@@ -903,7 +924,7 @@ function MentorForm({ onSubmit }: { onSubmit: (data: Record<string, unknown>) =>
             Languages You Speak
           </label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {availableLanguages.map(language => (
+            {LANGUAGE_OPTIONS.map(language => (
               <label key={language} className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
