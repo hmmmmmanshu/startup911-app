@@ -54,72 +54,62 @@ const faqData = [
 export default function FAQPage() {
   return (
     <div className="bg-black text-white min-h-screen">
-      <div className="container mx-auto px-6 py-20 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Startup Funding FAQ
+      <div className="max-w-4xl mx-auto px-6 py-20">
+        {/* Enhanced Header - matching blog style */}
+        <header className="text-center mb-20">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            FAQ
           </h1>
-          <div className="w-24 h-1 bg-green-500 mx-auto mb-6"></div>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            Get answers to the most common questions about startup funding in India. Learn about grants, VCs, and the funding process.
+          <div className="w-16 h-0.5 bg-gradient-to-r from-green-500 to-gray-500 mx-auto mb-6"></div>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Get answers to the most common questions about startup funding in India
           </p>
-        </div>
+        </header>
 
-        {/* FAQ Section */}
-        <div className="space-y-8">
+        {/* FAQ Section - cleaner styling */}
+        <div className="space-y-0">
           {faqData.map((faq, index) => (
-            <div key={index} className="bg-[#1C1C1E] p-6 rounded-xl border border-gray-800">
-              <h2 className="text-xl font-bold text-white mb-4">
-                {faq.question}
-              </h2>
-              <p className="text-gray-400 leading-relaxed">
-                {faq.answer}
-              </p>
-            </div>
+            <article key={index} className="group">
+              <div className="py-8 border-b border-gray-800/50 last:border-b-0 transition-all duration-300 hover:bg-gray-900/20 hover:border-gray-700 rounded-lg hover:px-6 -mx-6">
+                <h2 className="text-xl md:text-2xl font-bold mb-4 leading-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-gray-300 group-hover:bg-clip-text transition-all duration-300">
+                  {faq.question}
+                </h2>
+                <p className="text-gray-400 text-lg leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+                  {faq.answer}
+                </p>
+              </div>
+            </article>
           ))}
         </div>
 
-        {/* Call to Action */}
-        <div className="mt-16 text-center">
+        {/* Call to Action - subdued colors */}
+        <div className="mt-20 pt-12 border-t border-gray-800/50 text-center">
           <h2 className="text-2xl font-bold text-white mb-6">
             Ready to Find Funding for Your Startup?
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/grants" className="px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">
+            <Link href="/grants" className="px-8 py-4 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-all duration-300 hover:scale-105">
               Explore Grants
             </Link>
-            <Link href="/vcs" className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
+            <Link href="/vcs" className="px-8 py-4 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-all duration-300 hover:scale-105">
               Browse VCs
             </Link>
-            <Link href="/mentors" className="px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors">
+            <Link href="/mentors" className="px-8 py-4 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-all duration-300 hover:scale-105">
               Find Mentors
             </Link>
           </div>
         </div>
 
-        {/* Related Links */}
-        <div className="mt-16 p-6 bg-[#1C1C1E] rounded-xl border border-gray-800">
-          <h3 className="text-xl font-bold text-white mb-4">Related Resources</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-semibold text-green-400 mb-2">Government Grants</h4>
-              <ul className="space-y-1 text-gray-400">
-                <li><Link href="/grants" className="hover:text-white">NIDHI Seed Support Program</Link></li>
-                <li><Link href="/grants" className="hover:text-white">Startup India Seed Fund</Link></li>
-                <li><Link href="/grants" className="hover:text-white">BIRAC Grants</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-blue-400 mb-2">Venture Capital</h4>
-              <ul className="space-y-1 text-gray-400">
-                <li><Link href="/vcs" className="hover:text-white">Bangalore VC Directory</Link></li>
-                <li><Link href="/vcs" className="hover:text-white">Mumbai Angel Investors</Link></li>
-                <li><Link href="/vcs" className="hover:text-white">Delhi Venture Capital</Link></li>
-              </ul>
-            </div>
+        {/* Enhanced Footer */}
+        <footer className="mt-20 pt-12 border-t border-gray-800/50 text-center">
+          <div className="flex items-center justify-center gap-4 text-gray-500">
+            <div className="w-8 h-px bg-gradient-to-r from-transparent to-gray-600"></div>
+            <p className="text-sm">
+              {faqData.length} question{faqData.length !== 1 ? 's' : ''} answered
+            </p>
+            <div className="w-8 h-px bg-gradient-to-l from-transparent to-gray-600"></div>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   );
